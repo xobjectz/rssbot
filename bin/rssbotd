@@ -23,7 +23,6 @@ from rssbot import cdir, launch, parse_command, spl
 Cfg         = Default()
 Cfg.mod     = "irc,rss"
 Cfg.name    = "rssbot"
-Cfg.version = "510"
 Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
 Cfg.user    = getpass.getuser()

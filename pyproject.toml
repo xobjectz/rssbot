@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rssbot"
-description = "feeding rss"
+description = "displaying rss feeds in your channel."
 version = "510"
 authors = [
     {name = "Bart Thate",email = "objx@proton.me"},
