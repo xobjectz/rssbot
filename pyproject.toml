@@ -1,0 +1,55 @@
+[build-system]
+requires = [
+    "setuptools>=43.0.0",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "rssbot"
+description = "feeding rss"
+version = "510"
+authors = [
+    {name = "Bart Thate",email = "objx@proton.me"},
+]
+readme = "README.rst"
+license = {text="Public Domain"}
+classifiers = [ 
+    'Development Status :: 3 - Alpha',
+    'License :: Public Domain',
+    'Operating System :: Unix',
+    'Programming Language :: Python',
+    'Topic :: Utilities'
+]
+
+
+[project.urls]
+"home" = "https://pypi.org/project/rssbot"
+"bugs" = "https://github.com/xobjectz/rssbot/issues"
+"source" = "https://github.com/xobjectz/rssbot"
+
+
+[tool.setuptools]
+script-files = [
+    "bin/rssbot",
+    "bin/rssbotd"
+]
+packages = [
+    "rssbot",
+    "rssbot.modules"
+]
+zip-safe=true
+
+
+[tool.setuptools.data-files]
+"share/doc/rssbot" = [
+    "README.rst"
+]
+
+[tool.setuptools.exclude-package-data]
+"*" = [
+       "env*",
+       "html*",
+       "test*"
+      ]

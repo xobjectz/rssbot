@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+# This file is placed in the Public Domain.
+#
+# pylint: disable=C,R,W0212
+
+
+"feeding rss"
+
+
+import getpass
+import inspect
+import os
+import pwd
+import sys
+import time
+import _thread
+
+
+from rssbot import Command, Default, Object, Storage
+from rssbot import cdir, launch, parse_command, spl
+
+
+Cfg         = Default()
+Cfg.mod     = "cmd,err,irc,mod,mre,pwd,rss,thr"
+Cfg.name    = "rssbot"
+Cfg.version = "510"
+Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
+Cfg.pidfile = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
+Cfg.user    = getpass.getuser()
+Storage.wd  = Cfg.wd
+
+
+from rssbot import modules
+
+
+def daemon(pidfile, verbose=False):
+    pid = os.fork()
+    if pid != 0:
+        os._exit(0)
+    os.setsid()
+    pid2 = os.fork()
+    if pid2 != 0:
+        os._exit(0)
+    if not verbose:
+        with open('/dev/null', 'r', encoding="utf-8") as sis:
+            os.dup2(sis.fileno(), sys.stdin.fileno())
+        with open('/dev/null', 'a+', encoding="utf-8") as sos:
+            os.dup2(sos.fileno(), sys.stdout.fileno())
+        with open('/dev/null', 'a+', encoding="utf-8") as ses:
+            os.dup2(ses.fileno(), sys.stderr.fileno())
+    os.umask(0)
+    os.chdir("/")
+    if os.path.exists(pidfile):
+        os.unlink(pidfile)
+    cdir(os.path.dirname(pidfile))
+    with open(pidfile, "w", encoding="utf-8") as fds:
+        fds.write(str(os.getpid()))
+
+
+def forever():
+    while 1:
+        try:
+            time.sleep(1.0)
+        except (KeyboardInterrupt, EOFError):
+            _thread.interrupt_main()
+
+
+def privileges(username):
+    pwnam = pwd.getpwnam(username)
+    os.setgid(pwnam.pw_gid)
+    os.setuid(pwnam.pw_uid)
+
+
+def scan(pkg, modstr, initer=False, wait=True) -> []:
+    mds = []
+    for modname in spl(modstr):
+        module = getattr(pkg, modname, None)
+        if not module:
+            continue
+        for _key, cmd in inspect.getmembers(module, inspect.isfunction):
+            if 'event' in cmd.__code__.co_varnames:
+                Command.add(cmd)
+        for _key, clz in inspect.getmembers(module, inspect.isclass):
+            if not issubclass(clz, Object):
+                continue
+            Storage.add(clz)
+        if initer and "init" in dir(module):
+            module._thr = launch(module.init, name=f"init {modname}")
+            mds.append(module)
+    if wait and initer:
+        for mod in mds:
+            mod._thr.join()
+    return mds
+
+
+def main():
+    Storage.skel()
+    parse_command(Cfg, " ".join(sys.argv[1:]))
+    daemon(Cfg.pidfile)
+    privileges(Cfg.user)
+    scan(modules, Cfg.mod, True)
+    forever()
+
+
+main()

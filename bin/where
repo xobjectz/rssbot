@@ -1,0 +1,5 @@
+grep -R "print(" rssbot
+grep -R importlib rssbot
+grep -R sys rssbot
+grep -R __import__ rssbot
+

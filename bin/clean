@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+# This file is placed in the Public Domain.
+#
+# pylint: disable=C0116
+
+
+"clean directories"
+
+
+import os
+import sys
+
+
+SKIP = ["env", ".git"]
+
+
+def loop(path, txt):
+    old = os.getcwd()
+    os.chdir(path)
+    for fnn in os.listdir(path):
+        if fnn in SKIP:
+            continue
+        old = os.getcwd()
+        fpath = os.path.abspath(os.path.join(path, fnn))
+        if os.path.isdir(fpath):
+            loop(fpath, txt)
+        if not os.path.isdir(fpath):
+            continue
+        os.chdir(fpath)
+        popen(txt)
+        os.chdir(old)
+        #os.chdir("..")
+    os.chdir(old)
+
+
+def popen(txt):
+    for line in os.popen(txt).readlines():
+        print(line.rstrip())
+        sys.stdout.flush()
+
+
+def main():
+    popen("rm -fRv test DEAD* build dist MANIFEST *.egg-info *.whl")
+    popen("rm -fRv .pytest_cache .test __pycache__")
+    popen("rm -fRv lib/*.egg-info")
+    popen("rm -fRv .*~ *~")
+    popen('rm -fRv docs/sbn*.rst')
+    popen('rm -fRv html')
+    if "-f" in sys.argv:
+        popen("rm -fRv store env .censor")
+    loop(".", "rm -fRv *~")
+    loop(".", "rm -fRv __pycache__")
+
+
+if __name__ == "__main__":
+    main()
