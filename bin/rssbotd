@@ -21,7 +21,7 @@ from rssbot import cdir, launch, parse_command, spl
 
 
 Cfg         = Default()
-Cfg.mod     = "cmd,err,irc,mod,mre,pwd,rss,thr"
+Cfg.mod     = "irc,rss"
 Cfg.name    = "rssbot"
 Cfg.version = "510"
 Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
