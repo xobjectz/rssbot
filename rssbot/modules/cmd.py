@@ -6,7 +6,7 @@
 "list of commands"
 
 
-from objx import Command
+from .. import Command
 
 
 def cmd(event):
