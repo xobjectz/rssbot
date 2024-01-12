@@ -9,9 +9,9 @@
 import time
 
 
-from objx import Event, Fleet, Timer
-from objx import find, laps, launch, update, sync
-from objx import NoDate, today, to_day, get_day, get_hour
+from .. import Event, Fleet, Timer
+from .. import find, laps, launch, update, sync
+from .. import NoDate, today, to_day, get_day, get_hour
 
 
 def init():

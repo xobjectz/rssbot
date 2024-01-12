@@ -16,15 +16,15 @@ import time
 import _thread
 
 
-from objx import Default, Object, edit, fmt, keys
-from objx import Client, Command, Error, Event
-from objx import byorig, debug, last, launch, sync
+from .. import Default, Object, edit, fmt, keys
+from .. import Client, Command, Error, Event
+from .. import byorig, debug, last, launch, sync
 
 
 Error.filter = ["PING", "PONG", "PRIVMSG"]
 
 
-NAME = "objx"
+NAME = "rssbot"
 
 
 saylock = _thread.allocate_lock()
@@ -40,7 +40,7 @@ def init():
 class Config(Default):
 
     channel = f'#{NAME}'
-    commands = True
+    commands = False
     control = '!'
     edited = time.time()
     nick = NAME
