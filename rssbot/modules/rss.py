@@ -18,9 +18,9 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 
 
-from objx import Default, Object, fmt, update
-from objx import Fleet, Repeater
-from objx import fntime, find, launch, laps, last, sync
+from .. import Default, Object, fmt, update
+from .. import Fleet, Repeater
+from .. import fntime, find, launch, laps, last, sync
 
 
 def init():

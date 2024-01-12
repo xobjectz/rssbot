@@ -25,7 +25,7 @@ from rssbot import cdir, debug, launch, parse_command, spl
 
 
 Cfg         = Default()
-Cfg.mod     = "cmd,err,mod,mre,pwd,thr"
+Cfg.mod     = "cmd,irc,mod,pwd,rss"
 Cfg.name    = "rssbot"
 Cfg.version = "510"
 Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
@@ -129,8 +129,6 @@ def scan(pkg, modstr, initer=False, wait=True) -> []:
 def main():
     Storage.skel()
     parse_command(Cfg, " ".join(sys.argv[1:]))
-    if "a" in Cfg.opts:
-        Cfg.mod = ",".join(modules.__dir__())
     if "v" in Cfg.opts:
         dte = time.ctime(time.time()).replace("  ", " ")
         debug(f"{Cfg.name.upper()} started {Cfg.opts.upper()} started {dte}")
