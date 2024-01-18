@@ -84,8 +84,8 @@ replace "<user>" with the user running pipx
 
     [Unit]
     Description=feeding rss
-    Requires=network.target
-    After=network.target
+    Requires=network-online.target
+    After=network-online.target
 
     [Service]
     Type=simple
