@@ -83,7 +83,7 @@ replace "<user>" with the user running pipx
 ::
 
     [Unit]
-    Description=feeding rss
+    Description=displaying rss feeds in your channel
     Requires=network-online.target
     After=network-online.target
 
