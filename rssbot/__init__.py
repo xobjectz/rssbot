@@ -5,8 +5,9 @@
 
 """Original Programmer Daemon
 
-opd <cmd> [key=val] [key==val] [mod=n1,n2]
-opd [-a] [-c] [-d] [-h] [-v]
+rssbot
+rssbot <cmd> [key=val] [key==val] [mod=n1,n2]
+rssbot [-a] [-c] [-d] [-h] [-v]
 
 commands:
 

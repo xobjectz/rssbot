@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rssbot"
-description = "displaying rss feeds in your channel."
+description = "displaying rss feeds in your channel"
 version = "520"
 authors = [
     {name = "Bart Thate",email = "objx@proton.me"},
@@ -26,7 +26,7 @@ classifiers = [
 
 [project.scripts]
 rssbot = "rssbot.__main__:main"
-rssbotd = "rssbot.runtime:wrapped"
+rssbotd = "rssbot.runtime:main"
 
 
 [project.urls]
