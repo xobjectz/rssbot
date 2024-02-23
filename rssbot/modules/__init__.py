@@ -6,31 +6,14 @@
 "modules"
 
 
-from . import cmd, ena, irc, log, mod, mre, pwd, rss, tdo, flt, thr
-from . import mdl, req, slg
-
-
-def __geno__():
-    return (
-        'mdl',
-        'req',
-        'slg'
-    )
+from . import cmd, irc, rss
 
 
 def __dir__():
     return (
         'cmd',
-        'ena',
-        'flt',
         'irc',
-        'log',
-        'mod',
-        'mre',
-        'pwd',
         'rss',
-        'tdo',
-        'thr'
     )
 
 
