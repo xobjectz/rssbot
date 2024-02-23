@@ -14,6 +14,7 @@ INSTALL
 ::
 
     $ pipx install rssbot
+    $ pipx ensurepath
 
 
 SYNOPSIS
