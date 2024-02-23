@@ -9,9 +9,15 @@
 import time
 
 
-from .. import Event, Fleet, Timer
-from .. import find, laps, launch, update, sync
-from .. import NoDate, today, to_day, get_day, get_hour
+from ..brokers import Broker
+from ..locates import find
+from ..message import Message
+from ..objects import update
+from ..parsers import NoDate, get_day, get_hour, laps, today
+from ..parsers import to_day
+from ..repeats import Timer
+from ..persist import sync
+from ..threads import launch
 
 
 def init():
@@ -20,8 +26,8 @@ def init():
             continue
         diff = float(obj.time) - time.time()
         if diff > 0:
-            bot = Fleet.first()
-            evt = Event()
+            bot = Broker.first()
+            evt = Message()
             update(evt, obj)
             evt.orig = object.__repr__(bot)
             timer = Timer(diff, evt.show)
@@ -47,7 +53,7 @@ def tmr(event):
         if word.startswith("+"):
             try:
                 seconds = int(word[1:])
-            except:
+            except (ValueError, IndexError):
                 event.reply("%s is not an integer" % seconds)
                 return
         else:

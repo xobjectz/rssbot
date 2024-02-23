@@ -3,14 +3,17 @@
 # pylint: disable=C,R,E0402
 
 
-from .. import byorig
+"show cached output"
+
+
+from ..brokers import Broker
 
 
 def mre(event):
     if not event.channel:
         event.reply('channel is not set.')
         return
-    bot = byorig(event.orig)
+    bot = Broker.get(event.orig)
     if 'cache' not in dir(bot):
         event.reply('bot is missing cache')
         return

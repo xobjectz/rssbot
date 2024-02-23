@@ -12,29 +12,24 @@ import re
 import time as ttime
 
 
-from .objects import Default
+from .default import Default
 
 
 def __dir__():
     return (
         'NoDate',
         'fntime',
-        'get_day',
-        'get_hour',
-        'get_time',
         'laps',
-        'parse_command',
+        'parse_cmd',
         'parse_time',
-        'spl',
-        'today',
-        'to_day'
+        'spl'
     )
 
 
 __all__ = __dir__()
 
 
-bdmonths = [
+MONTHS = [
     'Bo',
     'Jan',
     'Feb',
@@ -51,7 +46,7 @@ bdmonths = [
 ]
 
 
-year_formats = [
+FORMATS = [
     "%Y-%m-%d",
     "%d-%m-%Y",
     "%d-%m",
@@ -65,16 +60,16 @@ class NoDate(Exception):
 
 
 def extract_date(daystr):
-    for fmt in year_formats:
+    for fmt in FORMATS:
         try:
             res = ttime.mktime(ttime.strptime(daystr, fmt))
-        except:
+        except ValueError:
             res = None
         if res:
             return res
 
 
-def fntime(daystr) -> float:
+def fntime(daystr):
     daystr = daystr.replace('_', ':')
     datestr = ' '.join(daystr.split(os.sep)[-2:])
     if '.' in datestr:
@@ -91,7 +86,7 @@ def get_day(daystr):
     try:
         ymdre = re.search(r'(\d+)-(\d+)-(\d+)', daystr)
         (day, month, yea) = ymdre.groups()
-    except:
+    except ValueError:
         try:
             ymre = re.search(r'(\d+)-(\d+)', daystr)
             (day, month) = ymre.groups()
@@ -101,7 +96,7 @@ def get_day(daystr):
     day = int(day)
     month = int(month)
     yea = int(yea)
-    date = "%s %s %s" % (day, bdmonths[month], yea)
+    date = "%s %s %s" % (day, MONTHS[month], yea)
     return ttime.mktime(ttime.strptime(date, r"%d %b %Y"))
 
 
@@ -137,7 +132,7 @@ def get_time(txt):
     return target
 
 
-def laps(seconds, short=True) -> str:
+def laps(seconds, short=True):
     txt = ""
     nsec = float(seconds)
     if nsec < 1:
@@ -176,7 +171,7 @@ def laps(seconds, short=True) -> str:
     return txt
 
 
-def parse_command(obj, txt=None) -> None:
+def parse_cmd(obj, txt=None):
     args = []
     obj.args    = obj.args or []
     obj.cmd     = obj.cmd or ""
@@ -251,7 +246,7 @@ def parse_time(txt):
     return target
 
 
-def spl(txt) -> []:
+def spl(txt):
     try:
         res = txt.split(',')
     except (TypeError, ValueError):

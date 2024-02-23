@@ -3,47 +3,45 @@
 # pylint: disable=C,R,E0402
 
 
-"list of bots"
+"object cache"
 
 
-from .objects import Object
+from .objects import Object, keys, values
 
 
 def __dir__():
     return (
-        "Fleet",
-        "byorig"
+        'Broker',
     )
 
 
 __all__ = __dir__()
 
 
-class Fleet(Object):
+rpr = object.__repr__
 
-    objs = []
+
+class Broker(Object):
+
+    objs = Object()
 
     @staticmethod
-    def add(obj) -> None:
-        Fleet.objs.append(obj)
+    def add(obj):
+        setattr(Broker.objs, rpr(obj), obj)
+
+    @staticmethod
+    def all():
+        return values(Broker.objs)
 
     @staticmethod
     def first():
-        if Fleet.objs:
-            return Fleet.objs[0]
+        for key in keys(Broker.objs):
+            return getattr(Broker.objs, key)
+
+    @staticmethod
+    def get(orig):
+        return getattr(Broker.objs, orig, None)
 
     @staticmethod
     def remove(obj):
-        if obj in Fleet.objs:
-            Fleet.objs.remove(obj)
-
-    @staticmethod
-    def byorig(orig) -> Object:
-        for obj in Fleet.objs:
-            if object.__repr__(obj) == orig:
-                return obj
-        return None
-
-
-def byorig(orig):
-    return Fleet.byorig(orig)
+        delattr(Broker.objs, rpr(obj))

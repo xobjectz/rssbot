@@ -1,61 +1,28 @@
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C,R,W0401,W0614,E0402
+# pylint: disable=C,R,W0401,W0622,E0402,E0603
 
 
-"objects library"
+"""Original Programmer Daemon
 
+opd <cmd> [key=val] [key==val] [mod=n1,n2]
+opd [-a] [-c] [-d] [-h] [-v]
 
-from .brokers import *
-from .clients import *
-from .command import *
-from .excepts import *
-from .handler import *
-from .objects import *
-from .parsers import *
-from .storage import *
-from .threads import *
+commands:
 
+cmd - commands
+mod - show available modules
 
-def __dir__():
-    return (
-        'Client',
-        'Command',
-        'Default',
-        'Error',
-        'Event',
-        'Fleet',
-        'Handler',
-        'NoDate',
-        'Object',
-        'Repeater',
-        'Storage',
-        'Thread',
-        'Timer',
-        'byorig',
-        'cdir',
-        'construct',
-        'debug',
-        'edit',
-        'fetch',
-        'find',
-        'fmt',
-        'fntime',
-        'fqn',
-        'ident',
-        'items',
-        'keys',
-        'laps',
-        'last',
-        'launch',
-        'name',
-        'parse_command',
-        'parse_time',
-        'read',
-        'search',
-        'spl',
-        'sync',
-        'update',
-        'values',
-        'write'
-    )
+modules:
+
+$ opd mod
+cmd,flt,irc,log,mod,mre,pwd,req,rss,tdo,thr
+
+options:
+
+-a     load all modules
+-c     start console
+-d     start daemon
+-h     display help
+-v     use verbose
+"""

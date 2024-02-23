@@ -18,9 +18,15 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 
 
-from .. import Default, Object, fmt, update
-from .. import Fleet, Repeater
-from .. import fntime, find, launch, laps, last, sync
+from ..brokers import Broker
+from ..default import Default
+from ..locates import find, last
+from ..objects import Object, fmt, update
+from ..parsers import laps
+from ..persist import sync
+from ..repeats import Repeater
+from ..utility import fntime
+from ..threads import launch
 
 
 def init():
@@ -56,9 +62,10 @@ class Seen(Default):
 
 class Fetcher(Object):
 
-    dosave = False
-    seen = Seen()
-    seenfn = None
+    def __init__(self):
+        self.dosave = False
+        self.seen = Seen()
+        self.seenfn = None
 
     @staticmethod
     def display(obj):
@@ -84,7 +91,7 @@ class Fetcher(Object):
     def fetch(self, feed):
         with fetchlock:
             counter = 0
-            res = []
+            result = []
             for obj in reversed(list(getfeed(feed.rss, feed.display_list))):
                 fed = Feed()
                 update(fed, obj)
@@ -95,22 +102,22 @@ class Fetcher(Object):
                         uurl = f'{url.scheme}://{url.netloc}/{url.path}'
                     else:
                         uurl = fed.link
-                    if uurl in Fetcher.seen.urls:
+                    if uurl in self.seen.urls:
                         continue
-                    Fetcher.seen.urls.append(uurl)
+                    self.seen.urls.append(uurl)
                 counter += 1
                 if self.dosave:
                     sync(fed)
-                res.append(fed)
-        if res:
-            sync(Fetcher.seen, Fetcher.seenfn)
+                result.append(fed)
+        if result:
+            sync(self.seen, self.seenfn)
         txt = ''
         feedname = getattr(feed, 'name', None)
         if feedname:
             txt = f'[{feedname}] '
-        for obj in res:
+        for obj in result:
             txt2 = txt + self.display(obj)
-            for bot in Fleet.objs:
+            for bot in Broker.all():
                 if "announce" in dir(bot):
                     bot.announce(txt2.rstrip())
         return counter
@@ -122,7 +129,7 @@ class Fetcher(Object):
         return thrs
 
     def start(self, repeat=True):
-        Fetcher.seenfn = last(Fetcher.seen)
+        self.seenfn = last(self.seen)
         if repeat:
             repeater = Repeater(300.0, self.run)
             repeater.start()
@@ -147,14 +154,45 @@ class Parser(Object):
 
     @staticmethod
     def parse(txt, item='title,link'):
-        res = []
+        result = []
         for line in txt.split('<item>'):
             line = line.strip()
             obj = Object()
             for itm in item.split(","):
                 setattr(obj, itm, Parser.getitem(line, itm))
-            res.append(obj)
-        return res
+            result.append(obj)
+        return result
+
+
+class OPML(Parser):
+
+    @staticmethod
+    def getitem(line, item):
+        lne = ''
+        try:
+            index1 = line.index(f"{item}") + len(item) + 2
+            sub1 = line[index1:]
+            lne = sub1.split('" ')[0][:-3]
+        except ValueError:
+            pass
+        if 'CDATA' in lne:
+            lne = lne.replace('![CDATA[', '')
+            lne = lne.replace(']]', '')
+            lne = lne[1:-1]
+        return lne
+
+    @staticmethod
+    def parse(txt, item='title,text,xmlUrl'):
+        result = []
+        for line in txt.split("<outline "):
+            line = line.strip()
+            line = line[2:]
+            obj = Object()
+            for itm in item.split(","):
+                lne = OPML.getitem(line, itm)
+                setattr(obj, itm, lne)
+            result.append(obj)
+        return result
 
 
 def getfeed(url, item):
@@ -236,6 +274,12 @@ def nme(event):
     event.reply('ok')
 
 
+def opm(event):
+    result = OPML.parse(TXT)
+    for obj in result:
+        event.reply(f"{obj.title} {obj.xmlUrl}")
+
+
 def rem(event):
     if len(event.args) != 1:
         event.reply('rem <stringinurl>')
@@ -244,6 +288,18 @@ def rem(event):
     for fnm, feed in find('rss', selector):
         if feed:
             feed.__deleted__ = True
+            sync(feed, fnm)
+    event.reply('ok')
+
+
+def res(event):
+    if len(event.args) != 1:
+        event.reply('res <stringinurl>')
+        return
+    selector = {'rss': event.args[0]}
+    for fnm, feed in find('rss', selector, deleted=True):
+        if feed:
+            feed.__deleted__ = False
             sync(feed, fnm)
     event.reply('ok')
 
@@ -263,11 +319,52 @@ def rss(event):
     if 'http' not in url:
         event.reply('i need an url')
         return
-    for fnm, res in find('rss', {'rss': url}):
-        if res:
+    for fnm, result in find('rss', {'rss': url}):
+        if result:
             event.reply(f'already got {url}')
             return
     feed = Rss()
     feed.rss = event.args[0]
     sync(feed)
     event.reply('ok')
+
+
+TXT = """<opml version="1.0">
+    <head>
+        <title>Sample OPML file for RSSReader</title>
+    </head>
+    <body>
+        <outline title="News" text="News">
+            <outline text="Big News Finland" title="Big News Finland" type="rss" xmlUrl="http://www.bignewsnetwork.com/?rss=37e8860164ce009a"/>
+            <outline text="Euronews" title="Euronews" type="rss" xmlUrl="http://feeds.feedburner.com/euronews/en/news/"/>
+            <outline text="Reuters Top News" title="Reuters Top News" type="rss" xmlUrl="http://feeds.reuters.com/reuters/topNews"/>
+            <outline text="Yahoo Europe" title="Yahoo Europe" type="rss" xmlUrl="http://rss.news.yahoo.com/rss/europe"/>
+        </outline>
+
+        <outline title="Leisure" text="Leisure">
+            <outline text="CNN Entertainment" title="CNN Entertainment" type="rss" xmlUrl="http://rss.cnn.com/rss/edition_entertainment.rss"/>
+            <outline text="E! News" title="E! News" type="rss" xmlUrl="http://uk.eonline.com/syndication/feeds/rssfeeds/topstories.xml"/>
+            <outline text="Hollywood Reporter" title="Hollywood Reporter" type="rss" xmlUrl="http://feeds.feedburner.com/thr/news"/>
+            <outline text="Reuters Entertainment" title="Reuters Entertainment" type="rss"  xmlUrl="http://feeds.reuters.com/reuters/entertainment"/>
+            <outline text="Reuters Music News" title="Reuters Music News" type="rss" xmlUrl="http://feeds.reuters.com/reuters/musicNews"/>
+            <outline text="Yahoo Entertainment" title="Yahoo Entertainment" type="rss" xmlUrl="http://rss.news.yahoo.com/rss/entertainment"/>
+        </outline>
+
+        <outline title="Sports" text="Sports">
+            <outline text="Formula 1" title="Formula 1" type="rss" xmlUrl="http://www.formula1.com/rss/news/latest.rss"/>
+            <outline text="MotoGP" title="MotoGP" type="rss" xmlUrl="http://rss.crash.net/crash_motogp.xml"/>
+            <outline text="N.Y.Times Track And Field" title="N.Y.Times Track And Field" type="rss" xmlUrl="http://topics.nytimes.com/topics/reference/timestopics/subjects/t/track_and_field/index.html?rss=1"/>
+            <outline text="Reuters Sports" title="Reuters Sports" type="rss" xmlUrl="http://feeds.reuters.com/reuters/sportsNews"/>
+            <outline text="Yahoo Sports NHL" title="Yahoo Sports NHL" type="rss" xmlUrl="http://sports.yahoo.com/nhl/rss.xml"/>
+            <outline text="Yahoo Sports" title="Yahoo Sports" type="rss" xmlUrl="http://rss.news.yahoo.com/rss/sports"/>
+        </outline>
+
+        <outline title="Tech" text="Tech">
+            <outline text="Coding Horror" title="Coding Horror" type="rss" xmlUrl="http://feeds.feedburner.com/codinghorror/"/>
+            <outline text="Gadget Lab" title="Gadget Lab" type="rss" xmlUrl="http://www.wired.com/gadgetlab/feed/"/>
+            <outline text="Gizmodo" title="Gizmodo" type="rss" xmlUrl="http://gizmodo.com/index.xml"/>
+            <outline text="Reuters Technology" title="Reuters Technology" type="rss" xmlUrl="http://feeds.reuters.com/reuters/technologyNews"/>
+        </outline>
+    </body>
+</opml>
+"""
