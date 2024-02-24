@@ -3,7 +3,7 @@
 # pylint: disable=C,R
 
 
-"main"
+"runtime"
 
 
 import getpass
@@ -24,17 +24,12 @@ Cfg.mod     = "cmd,irc,rss"
 Cfg.name    = __file__.split(os.sep)[-2]
 Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
-Cfg.user = getpass.getuser()
-
-
-Workdir.wd = Cfg.wd
+Cfg.user    = getpass.getuser()
+Workdir.wd  = Cfg.wd
 
 
 def main():
-    print(Cfg)
-    if checkpid(getpid(Cfg.pidfile)):
-        return
     daemon(Cfg.pidfile)
     privileges(Cfg.user)
-    scan(modules, Cfg.mod, True, Cfg.dis, True)
+    scan(modules, Cfg.mod, True)
     forever()
