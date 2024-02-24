@@ -6,7 +6,7 @@ NAME
 
 ::
 
-    RSSBOT - displaying rss feeds in your channel.
+    RSSBOT - 24/7 RSS Fetcher
 
 
 INSTALL
@@ -84,7 +84,7 @@ replace "<user>" with the user running pipx
 ::
 
     [Unit]
-    Description=displaying rss feeds in your channel
+    Description=24/7 RSS Fecher
     Requires=network-online.target
     After=network-online.target
 
@@ -124,7 +124,7 @@ AUTHOR
 
 ::
 
-    Bart Thate <objx@proton.me>
+    Bart Thate <bthate@dds.nl>
 
 
 COPYRIGHT

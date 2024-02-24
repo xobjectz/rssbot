@@ -8,10 +8,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rssbot"
-description = "displaying rss feeds in your channel"
-version = "520"
+description = "24/7 RSS Fetcher"
+version = "521"
 authors = [
-    {name = "Bart Thate",email = "objx@proton.me"},
+    {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
 readme = "README.rst"
 license = {text="Public Domain"}
