@@ -7,7 +7,6 @@ import sys
 
 
 from .clients import cmnd
-from .default import Default
 from .runtime import Cfg
 from .scanner import scan
 
