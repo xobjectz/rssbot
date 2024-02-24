@@ -8,8 +8,10 @@
 
 import getpass
 import os
+import sys
 
 
+from .clients import cmnd 
 from .default import Default
 from .scanner import scan
 from .utility import checkpid, daemon, forever, getpid, privileges
@@ -26,6 +28,11 @@ Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
 Cfg.user    = getpass.getuser()
 Workdir.wd  = Cfg.wd
+
+
+def cli():
+    scan(modules, Cfg.mod)
+    cmnd(" ".join(sys.argv[1:]), print)
 
 
 def main():

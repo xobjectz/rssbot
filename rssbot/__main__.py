@@ -3,24 +3,11 @@
 # pylint: disable=C,R
 
 
-import sys
+"main"
 
 
-from .clients import cmnd
-from .runtime import Cfg
-from .scanner import scan
-
-
-from . import modules
-
-
-Cfg.mod = ",".join(modules.__dir__())
-
-
-def main():
-    scan(modules, Cfg.mod)
-    cmnd(" ".join(sys.argv[1:]), print)
+from .runtime import cli
 
 
 if __name__ == "__main__":
-    main()
+    cli()
