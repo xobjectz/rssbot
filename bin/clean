@@ -41,11 +41,13 @@ def popen(txt):
 
 def main():
     popen("rm -fRv DEAD* build dist MANIFEST *.egg-info *.whl")
-    popen("rm -fRv test .pytest_cache .test __pycache__")
+    popen("rm -fRv .pytest_cache .test __pycache__")
     popen("rm -fRv lib/*.egg-info")
     popen("rm -fRv .*~ *~")
+    popen('rm -fRv docs/sbn*.rst')
+    popen('rm -fRv html')
     if "-f" in sys.argv:
-        popen("rm -fRv store env")
+        popen("rm -fRv store env .censor")
     loop(".", "rm -fRv *~")
     loop(".", "rm -fRv __pycache__")
 
