@@ -6,7 +6,7 @@ NAME
 
 ::
 
-    RSSBOT - 24/7 RSS Fetcher
+    RSSBOT - 24/7 feed Fetcher
 
 
 INSTALL
