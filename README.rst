@@ -84,7 +84,7 @@ replace "<user>" with the user running pipx
 ::
 
     [Unit]
-    Description=24/7 RSS Fecher
+    Description=24/7 RSS Fetcher
     Requires=network-online.target
     After=network-online.target
 
