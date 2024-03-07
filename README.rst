@@ -97,7 +97,7 @@ replace "<user>" with the user running pipx
     RemainAfterExit=yes
 
     [Install]
-    WantedBy=multi-user.target
+    WantedBy=default.target
 
 
 then run this
