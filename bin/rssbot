@@ -22,7 +22,8 @@ from rssbot.handler import Client, Event
 from rssbot.runtime import Errors, init, parse_cmd
 
 
-from rssbot.modules.rss import Rss, Config
+from rssbot.modules.irc import Config
+from rssbot.modules.rss import Rss
 
 
 from rssbot import modules as mods

@@ -27,7 +27,7 @@ from rssbot import modules as mods
 
 
 Cfg         = Default()
-Cfg.mod     = "cmd,mod"
+Cfg.mod     = "irc,rss"
 Cfg.name    = "rssbot"
 Cfg.version = "540"
 Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
@@ -36,6 +36,9 @@ Workdir.wd = Cfg.wd
 
 
 dte = time.ctime(time.time()).replace("  ", " ")
+
+
+"utilities"
 
 
 def daemon(pidfile, verbose=False):
@@ -68,13 +71,15 @@ def privileges(username):
     os.setuid(pwnam.pw_uid)
 
 
+"runtime"
+
+
 def main():
     Workdir.skel()
-    Cfg.mod = ",".join(mods.__dir__())
     Cfg.user = getpass.getuser()
-    daemon(Cfg.pidfile, "v" in Cfg.opts)
+    daemon(Cfg.pidfile, True)
     privileges(Cfg.user)
-    init(mods, Cfg.mod, Cfg.sets.dis, True)
+    init(mods, Cfg.mod)
     forever()
 
 
