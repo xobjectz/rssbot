@@ -24,11 +24,6 @@ classifiers = [
 ]
 
 
-
-[project.scripts]
-"rssbot" = "rssbot.__main__:wrapped"
-"rssbotd" = "rssbot.__main__:daemoned"
-
 [project.urls]
 "home" = "https://pypi.org/project/rssbot"
 "bugs" = "https://github.com/xobjectz/rssbot/issues"
@@ -36,6 +31,11 @@ classifiers = [
 
 
 [tool.setuptools]
+script-files = [
+    'bin/rssbot',
+    'bin/rssbotd'
+]
+
 packages = [
     "rssbot",
     "rssbot.modules"

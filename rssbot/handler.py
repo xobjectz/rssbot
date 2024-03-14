@@ -86,30 +86,12 @@ class Handler:
 
 class Client(Handler):
 
-    cmds = Object()
-
     def __init__(self):
         Handler.__init__(self)
-        self.register("command", self.command)
         Broker.add(self)
-
-    @staticmethod
-    def add(func):
-        setattr(Client.cmds, func.__name__, func)
 
     def announce(self, txt):
         self.raw(txt)
-
-    def command(self, evt):
-        parse_cmd(evt)
-        func = getattr(Client.cmds, evt.cmd, None)
-        if func:
-            try:
-                func(evt)
-            except Exception as exc:
-                Errors.add(exc)
-        self.show(evt)
-        evt.ready()
 
     def raw(self, txt):
         pass
@@ -120,20 +102,6 @@ class Client(Handler):
     def show(self, evt):
         for txt in evt.result:
             self.say(evt.channel, txt)
-
-
-"utilities"
-
-
-def cmnd(txt, out):
-    clt = Client()
-    clt.raw = out
-    evn = Event()
-    evn.orig = object.__repr__(clt)
-    evn.txt = txt
-    clt.command(evn)
-    evn.wait()
-    return evn
 
 
 "interface"
