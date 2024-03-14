@@ -18,9 +18,13 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 
 
-from ..objects import Default, Object, fmt, update
-from ..persist import find, fntime, laps, last, sync
-from ..runtime import Broker, Repeater, launch
+from ..default import Default
+from ..handler import Client
+from ..objects import Object, fmt, update
+from ..persist import Persist, find, fntime, laps, last, sync
+from ..repeats import Repeater
+from ..runtime import Broker, spl
+from ..threads import launch
 
 
 def init():
@@ -47,11 +51,17 @@ class Rss(Default):
         self.display_list = 'title,link,author'
 
 
+Persist.add(Rss)
+
+
 class Seen(Default):
 
     def __init__(self):
         Default.__init__(self)
         self.urls = []
+
+
+Persist.add(Seen)
 
 
 class Fetcher(Object):
@@ -86,19 +96,18 @@ class Fetcher(Object):
         with fetchlock:
             counter = 0
             result = []
-            for obj in reversed(list(getfeed(feed.rss, feed.display_list))):
+            for obj in reversed(getfeed(feed.rss, feed.display_list)):
                 fed = Feed()
                 update(fed, obj)
                 update(fed, feed)
-                if 'link' in fed:
-                    url = urllib.parse.urlparse(fed.link)
-                    if url.path and not url.path == '/':
-                        uurl = f'{url.scheme}://{url.netloc}/{url.path}'
-                    else:
-                        uurl = fed.link
-                    if uurl in self.seen.urls:
-                        continue
-                    self.seen.urls.append(uurl)
+                url = urllib.parse.urlparse(fed.link)
+                if url.path and not url.path == '/':
+                    uurl = f'{url.scheme}://{url.netloc}/{url.path}'
+                else:
+                    uurl = fed.link
+                if uurl in self.seen.urls:
+                    continue
+                self.seen.urls.append(uurl)
                 counter += 1
                 if self.dosave:
                     sync(fed)
@@ -129,68 +138,103 @@ class Fetcher(Object):
             repeater.start()
 
 
-class Parser(Object):
+class Parser:
 
+    @staticmethod
+    def getvalue(line, attr):
+        lne = ''
+        index1 = line.find(f' {attr}="')
+        if index1 == -1:
+            return lne
+        index1 += len(attr) + 3
+        index2 = line.find('"', index1)
+        if index2 == -1:
+            index2 = line.find('"/>', index1)
+        if index2 == -1:
+            return lne
+        lne = line[index1:index2]
+        if 'CDATA' in lne:
+            lne = lne.replace('![CDATA[', '')
+            lne = lne.replace(']]', '')
+            #lne = lne[1:-1]
+        return lne
+
+    @staticmethod
+    def getattrs(line, token):
+        result = ""
+        index1 = line.find(f'<{token} ')
+        if index1 == -1:
+            return result
+        index1 += len(token) + 2
+        index2 = line.find('/>', index1)
+        if index2 == -1:
+            return result
+        result = line[index1:index2]
+        return result.strip()
+    
     @staticmethod
     def getitem(line, item):
         lne = ''
-        try:
-            index1 = line.index(f'<{item}>') + len(item) + 2
-            index2 = line.index(f'</{item}>')
-            if not index2:
-                index2 = line.index("/>", index1)
-            lne = line[index1:index2]
-            if 'CDATA' in lne:
-                lne = lne.replace('![CDATA[', '')
-                lne = lne.replace(']]', '')
-                lne = lne[1:-1]
-        except ValueError:
-            lne = None
-        return lne
-
+        index1 = line.find(f'<{item}>')
+        if index1 == -1:
+            return lne
+        index1 += len(item) + 2
+        index2 = line.find(f'</{item}>', index1)
+        if index2 == -1:
+            return lne
+        lne = line[index1:index2]
+        if 'CDATA' in lne:
+            lne = lne.replace('![CDATA[', '')
+            lne = lne.replace(']]', '')
+            lne = lne[1:-1]
+        return lne.strip()
 
     @staticmethod
-    def parse(txt, item='title,link'):
+    def getitems(text, token):
+        index = 0
         result = []
-        for line in txt.split('<item>'):
+        stop = False
+        while not stop:
+            index1 = text.find(f'<{token}>', index)
+            if index1 == -1:
+                break
+            index1 += len(token) + 2
+            index2 = text.find(f'</{token}>', index1)
+            if index2 == -1:
+                break
+            lne = text[index1:index2]
+            result.append(lne)
+            index = index2             
+        return result
+
+    @staticmethod
+    def parse(txt, toke="item", items='title,link'):
+        result = []
+        for line in Parser.getitems(txt, toke):
             line = line.strip()
-            obj = Object()
-            for itm in item.split(","):
-                setattr(obj, itm, Parser.getitem(line, itm))
+            obj = Default()
+            for itm in spl(items):
+                val = Parser.getitem(line, itm)
+                if val:
+                    val = unescape(val.strip())
+                    val = val.replace("\n", "")
+                    val = striphtml(val)
+                    setattr(obj, itm, val)
+                else:
+                    att = Parser.getattrs(line, itm)
+                    if att:
+                        if itm == "link":
+                            itm = "href"
+                        val = Parser.getvalue(att, itm)
+                        if val:
+                            if itm == "href":
+                                itm = "link"
+                            setattr(obj, itm, val.strip())
             result.append(obj)
         return result
 
 
-class OPML(Parser):
-
-    @staticmethod
-    def getitem(line, item):
-        lne = ''
-        try:
-            index1 = line.index(f"{item}") + len(item) + 2
-            sub1 = line[index1:]
-            lne = sub1.split('" ')[0]
-        except ValueError:
-            pass
-        return lne
-
-    @staticmethod
-    def parse(txt, item='title,text,xmlUrl'):
-        result = []
-        for line in txt.split("<outline "):
-            line = line.strip()
-            if not line.endswith("/>"):
-                continue
-            print(line)
-            obj = Object()
-            for itm in item.split(","):
-                lne = OPML.getitem(line, itm)
-                setattr(obj, itm, lne)
-            result.append(obj)
-        return result
-
-
-def getfeed(url, item):
+def getfeed(url, items):
     if DEBUG:
         return [Object(), Object()]
     try:
@@ -199,8 +243,11 @@ def getfeed(url, item):
         return [Object(), Object()]
     if not result:
         return [Object(), Object()]
-    return Parser.parse(str(result.data, 'utf-8'), item)
-
+    if url.endswith('atom'):
+        return Parser.parse(str(result.data, 'utf-8'), 'entry', items) or []
+    else:
+        return Parser.parse(str(result.data, 'utf-8'), 'item', items) or []
+    
 
 def gettinyurl(url):
     postarray = [
@@ -257,6 +304,9 @@ def dpl(event):
     event.reply('ok')
 
 
+Client.add(dpl)
+
+
 def nme(event):
     if len(event.args) != 2:
         event.reply('nme <stringinurl> <name>')
@@ -267,6 +317,9 @@ def nme(event):
             feed.name = event.args[1]
             sync(feed)
     event.reply('ok')
+
+
+Client.add(nme)
 
 
 def rem(event):
@@ -281,6 +334,9 @@ def rem(event):
     event.reply('ok')
 
 
+Client.add(rem)
+
+
 def res(event):
     if len(event.args) != 1:
         event.reply('res <stringinurl>')
@@ -291,6 +347,9 @@ def res(event):
             feed.__deleted__ = False
             sync(feed, fnm)
     event.reply('ok')
+
+
+Client.add(res)
 
 
 def rss(event):
@@ -316,3 +375,6 @@ def rss(event):
     feed.rss = event.args[0]
     sync(feed)
     event.reply('ok')
+
+
+Client.add(rss)

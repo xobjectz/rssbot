@@ -3,6 +3,7 @@
 # pylint: disable=C,R,W0105,W0612,W0718,E0402,W0201,W0603
 # ruff: noqa: F841
 
+
 "internet relay chat"
 
 
@@ -17,9 +18,12 @@ import time
 import _thread
 
 
-from ..objects import Default, Object, edit, fmt, keys
-from ..runtime import Broker, Client, Errors, Event, debug, launch
-from ..persist import last, sync
+from ..default import Default
+from ..objects import Object, edit, fmt, keys
+from ..handler import Client, Event
+from ..runtime import Broker, Errors, debug
+from ..persist import Persist, last, sync
+from ..threads import launch
 
 
 NAME    = __file__.split(os.sep)[-3]
@@ -55,7 +59,7 @@ def shutdown():
 class Config(Default):
 
     channel = f'#{NAME}'
-    commands = False
+    commands = True
     control = '!'
     edited = time.time()
     nick = NAME
@@ -78,6 +82,9 @@ class Config(Default):
         self.realname = self.realname or Config.realname
         self.server = self.server or Config.server
         self.username = self.username or Config.username
+
+
+Persist.add(Config)
 
 
 class TextWrap(textwrap.TextWrapper):
@@ -173,6 +180,7 @@ class IRC(Client, Output):
         self.sock = None
         self.state = Default()
         self.state.dostop = False
+        self.state.error = ""
         self.state.keeprunning = False
         self.state.lastline = ""
         self.state.nrconnect = 0
@@ -263,7 +271,7 @@ class IRC(Client, Output):
                     OSError,
                     ConnectionResetError
                    ) as ex:
-                self.state.errors = str(ex)
+                self.state.error = str(ex)
                 debug(str(ex))
             debug(f"sleeping {self.cfg.sleep} seconds")
             time.sleep(self.cfg.sleep)
@@ -287,10 +295,10 @@ class IRC(Client, Output):
         elif cmd == '002':
             self.state.host = evt.args[2][:-1]
         elif cmd == '366':
-            self.state.errors = []
+            self.state.error = ""
             self.events.joined.set()
         elif cmd == '433':
-            self.state.errors = txt
+            self.state.error = txt
             nck = self.cfg.nick + '_'
             self.docommand('NICK', nck)
         return evt
@@ -515,7 +523,7 @@ def cb_error(evt):
     if not bot.state.nrerror:
         bot.state.nrerror = 0
     bot.state.nrerror += 1
-    bot.state.errors.append(evt.txt)
+    bot.state.error = evt.txt
     debug(evt.txt)
 
 
@@ -598,6 +606,9 @@ def cfg(event):
         event.reply('ok')
 
 
+Client.add(cfg)
+
+
 def mre(event):
     if not event.channel:
         event.reply('channel is not set.')
@@ -617,6 +628,9 @@ def mre(event):
     event.reply(f'{size} more in cache')
 
 
+Client.add(mre)
+
+
 def pwd(event):
     if len(event.args) != 2:
         event.reply('pwd <nick> <password>')
@@ -628,3 +642,6 @@ def pwd(event):
     base = base64.b64encode(enc)
     dcd = base.decode('ascii')
     event.reply(dcd)
+
+
+Client.add(pwd)

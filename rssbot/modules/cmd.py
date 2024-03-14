@@ -6,8 +6,11 @@
 "list of commands"
 
 
-from ..runtime import Client
+from ..handler import Client
 
 
 def cmd(event):
     event.reply(",".join(sorted(list(Client.cmds))))
+
+
+Client.add(cmd)

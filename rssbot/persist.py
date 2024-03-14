@@ -7,32 +7,19 @@
 
 
 import datetime
-import inspect
 import os
 import pathlib
 import time
-import _thread
 
 
-from .objects import Default, Object, dump, fqn, load, search, update
+from .decoder import load
+from .default import Default
+from .encoder import dump
+from .locking import disklock
+from .objects import Object, fqn, search, update
 
 
-def __dir__():
-    return (
-        'Persist',
-        'Workdir',
-        'fetch',
-        'fntime',
-        'find',
-        'last',
-        'ident',
-        'read',
-        'sync',
-        'write'
-    )
-
-
-__all__ = __dir__()
+"classes"
 
 
 class Workdir(Object):
@@ -61,10 +48,6 @@ class Workdir(Object):
     @staticmethod
     def types():
         return os.listdir(Workdir.store())
-
-
-
-lock = _thread.allocate_lock()
 
 
 class Persist(Object):
@@ -104,12 +87,8 @@ class Persist(Object):
                     res = fnm
         return res
 
-    @staticmethod
-    def scan(mod):
-        for _key, clz in inspect.getmembers(mod, inspect.isclass):
-            if not issubclass(clz, Object):
-                continue
-            Persist.add(clz)
+
+"methods"
 
 
 def fetch(obj, pth):
@@ -138,7 +117,7 @@ def last(obj, selector=None):
 
 
 def read(obj, pth):
-    with lock:
+    with disklock:
         with open(pth, 'r', encoding='utf-8') as ofile:
             update(obj, load(ofile))
 
@@ -152,13 +131,13 @@ def sync(obj, pth=None):
 
 
 def write(obj, pth):
-    with lock:
+    with disklock:
         Workdir.cdir(os.path.dirname(pth))
         with open(pth, 'w', encoding='utf-8') as ofile:
             dump(obj, ofile, indent=4)
 
 
-"utilities"
+"utilitites"
 
 
 def laps(seconds, short=True):
@@ -227,3 +206,24 @@ def find(mtc, selector=None, index=None, deleted=False):
         if index is not None and nr != int(index):
             continue
         yield (fnm, obj)
+
+
+"interface"
+
+
+def __dir__():
+    return (
+        'Persist',
+        'Workdir',
+        'fetch',
+        'fntime',
+        'find',
+        'last',
+        'ident',
+        'read',
+        'sync',
+        'write'
+    )
+
+
+__all__ = __dir__()

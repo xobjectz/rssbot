@@ -9,7 +9,7 @@
 import os
 
 
-from ..handler import Client
+from objx.handler import Client
 
 
 from . import __dir__
