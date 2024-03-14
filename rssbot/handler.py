@@ -13,7 +13,7 @@ import _thread
 
 from .default import Default
 from .objects import Object
-from .runtime import Broker, Errors, parse_cmd
+from .runtime import Broker
 from .threads import launch
 
 
@@ -112,7 +112,6 @@ def __dir__():
         'Event',
         'Handler',
         'Client',
-        'cmnd'
     )
 
 

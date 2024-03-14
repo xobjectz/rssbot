@@ -1,32 +1,28 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C,R,W0105,W0201,W0212,W0613,E0402,E0611
+# pylint: disable=C,R,W0105,W0201,W0212,W0613,E0402,E0611,W0718
 # ruff: noqa: E402
 
 
 "24/7 feed fetcher"
 
 
-import getpass
+import base64
 import os
 import pwd
-import readline
 import sys
-import termios
-import threading
 import time
 
 
-"defines"
-
-
-
 from rssbot.default import Default
-from rssbot.objects import Object, update
-from rssbot.persist import Persist, Workdir, find, last, laps, sync
+from rssbot.objects import Object, edit, fmt, keys, update
+from rssbot.persist import Workdir, find, fntime, last, laps, sync
 from rssbot.handler import Client, Event
-from rssbot.runtime import Errors, debug, forever, init, parse_cmd
+from rssbot.runtime import Errors, init, parse_cmd
+
+
+from rssbot.modules.rss import Rss, Config
 
 
 from rssbot import modules as mods
@@ -73,13 +69,6 @@ class CLI(Client):
         Client.__init__(self)
         self.register("command", Command.command)
 
-    def announce(self, txt):
-        pass
-
-    def callback(self, evt):
-        C.callback(self, evt)
-        evt.wait()
-
     def say(self, channel, txt):
         txt = txt.encode('utf-8', 'replace').decode()
         print(txt)
@@ -119,7 +108,7 @@ def dpl(event):
         event.reply('dpl <stringinurl> <item1,item2>')
         return
     setter = {'display_list': event.args[1]}
-    for fnm, feed in find('rss', {'rss': event.args[0]}):
+    for _fn, feed in find('rss', {'rss': event.args[0]}):
         if feed:
             update(feed, setter)
             sync(feed)

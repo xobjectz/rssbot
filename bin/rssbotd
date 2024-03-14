@@ -5,32 +5,7 @@
 # ruff: noqa: E402
 
 
-"""RSSBOT - 24/7 feed fetcher
-
-    rssbot <cmd> [key=val] [key==val]
-    rssbot [-a] [-c] [-d] [-h] [-v]
-
-COMMANDS
-
-    cmd    list available commands
-    mod    list available modules
-
-USAGE
-
-    $ rssbot [cmnd] mod=module1,module2,module3
-    $ rssbot -c mod=module1,module2,module3
-
-OPTIONS
-
-    -a     load all modules
-    -c     start console
-    -d     start daemon
-    -h     display help
-    -v     use verbose
-"""
-
-
-"runtime"
+"24/7 feed fetcher"
 
 
 import getpass
@@ -42,8 +17,7 @@ import time
 
 from rssbot.default import Default
 from rssbot.persist import Workdir
-from rssbot.handler import Client, Event, cmnd
-from rssbot.runtime import Errors, debug, forever, init, parse_cmd
+from rssbot.runtime import forever, init
 
 
 from rssbot import modules as mods

@@ -7,7 +7,6 @@
 "internet relay chat"
 
 
-import base64
 import os
 import queue
 import socket
@@ -19,10 +18,10 @@ import _thread
 
 
 from ..default import Default
-from ..objects import Object, edit, fmt, keys
+from ..objects import Object
 from ..handler import Client, Event
 from ..runtime import Broker, Errors, debug
-from ..persist import Persist, last, sync
+from ..persist import Persist, last
 from ..threads import launch
 
 
