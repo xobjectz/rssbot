@@ -10,7 +10,7 @@
 import unittest
 
 
-from objx.modules.rss import Parser
+from rssbot.modules.rss import Parser
 
 
 class TestAtom(unittest.TestCase):

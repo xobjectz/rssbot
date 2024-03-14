@@ -1,171 +1,162 @@
-#!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C,R,W0105,W0201,W0212,W0613,E0402,E0611
-# ruff: noqa: E402
+# pylint: disable=C,R,W0201,W0612,E0402
 
 
-"""OBJX - objects library
-
-    objx <cmd> [key=val] [key==val]
-    objx [-a] [-c] [-d] [-h] [-v]
-
-COMMANDS
-
-    cmd    list available commands
-    mod    list available modules
-
-USAGE
-
-    $ objx [cmnd] mod=module1,module2,module3
-    $ objx -c mod=module1,module2,module3
-
-OPTIONS
-
-    -a     load all modules
-    -c     start console
-    -d     start daemon
-    -h     display help
-    -v     use verbose
-"""
+"commands"
 
 
-import getpass
-import os
-import pwd
-import readline
-import sys
-import termios
-import time
+from rssbot.persist import Persist, find, last, sync
+from rssbot.handler import Client
 
 
-sys.path.insert(0, os.getcwd())
+def cfg(event):
+    config = Config()
+    path = last(config)
+    if not event.sets:
+        event.reply(
+                    fmt(
+                        config,
+                        keys(config),
+                        skip='control,password,realname,sleep,username'.split(",")
+                       )
+                   )
+    else:
+        edit(config, event.sets)
+        sync(config, path)
+        event.reply('ok')
 
 
-from objx.default import Default
-from objx.persist import Workdir
-from objx.handler import Client, Event, cmnd
-from objx.runtime import Errors, debug, forever, init, parse_cmd
+Client.add(cfg)
+
+def cmd(event):
+    event.reply(",".join(sorted(list(Client.cmds))))
 
 
-Cfg         = Default()
-Cfg.mod     = "cmd,mod"
-Cfg.name    = "objx"
-Cfg.version = "62"
-Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
-Cfg.pidfile = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
-Workdir.wd = Cfg.wd
+Client.add(cmd)
 
 
-if os.path.exists("mods"):
-    import mods
-else:
-    mods = None
-
-
-dte = time.ctime(time.time()).replace("  ", " ")
-
-
-class Console(Client):
-
-    def announce(self, txt):
-        pass
-
-    def callback(self, evt):
-        Client.callback(self, evt)
-        evt.wait()
-
-    def poll(self):
-        evt = Event()
-        evt.orig = object.__repr__(self)
-        evt.txt = input("> ")
-        evt.type = "command"
-        return evt
-
-    def say(self, channel, txt):
-        txt = txt.encode('utf-8', 'replace').decode()
-        print(txt)
-
-
-def daemon(pidfile, verbose=False):
-    pid = os.fork()
-    if pid != 0:
-        os._exit(0)
-    os.setsid()
-    pid2 = os.fork()
-    if pid2 != 0:
-        os._exit(0)
-    if not verbose:
-        with open('/dev/null', 'r', encoding="utf-8") as sis:
-            os.dup2(sis.fileno(), sys.stdin.fileno())
-        with open('/dev/null', 'a+', encoding="utf-8") as sos:
-            os.dup2(sos.fileno(), sys.stdout.fileno())
-        with open('/dev/null', 'a+', encoding="utf-8") as ses:
-            os.dup2(ses.fileno(), sys.stderr.fileno())
-    os.umask(0)
-    os.chdir("/")
-    if os.path.exists(pidfile):
-        os.unlink(pidfile)
-    Workdir.cdir(os.path.dirname(pidfile))
-    with open(pidfile, "w", encoding="utf-8") as fds:
-        fds.write(str(os.getpid()))
-
-
-def privileges(username):
-    pwnam = pwd.getpwnam(username)
-    os.setgid(pwnam.pw_gid)
-    os.setuid(pwnam.pw_uid)
-
-
-def wrap(func):
-    old2 = None
-    try:
-        old2 = termios.tcgetattr(sys.stdin.fileno())
-    except termios.error:
-        pass
-    try:
-        func()
-    except (KeyboardInterrupt, EOFError):
-        print("")
-    finally:
-        if old2:
-            termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old2)
-
-
-def main():
-    Errors.enable(print)
-    Workdir.skel()
-    parse_cmd(Cfg, " ".join(sys.argv[1:]))
-    readline.redisplay()
-    if 'a' in Cfg.opts:
-        Cfg.mod = ",".join(mods.__dir__())
-    if "v" in Cfg.opts:
-        debug(f"{Cfg.name.upper()} {Cfg.opts.upper()} started {dte}")
-    if "h" in Cfg.opts:
-        print(__doc__)
+def dpl(event):
+    if len(event.args) < 2:
+        event.reply('dpl <stringinurl> <item1,item2>')
         return
-    if "d" in Cfg.opts:
-        Cfg.mod = ",".join(mods.__dir__())
-        Cfg.user = getpass.getuser()
-        daemon(Cfg.pidfile, "v" in Cfg.opts)
-        privileges(Cfg.user)
-        init(modules, Cfg.mod, Cfg.sets.dis, True)
-        forever()
+    setter = {'display_list': event.args[1]}
+    for fnm, feed in find('rss', {'rss': event.args[0]}):
+        if feed:
+            update(feed, setter)
+            sync(feed)
+    event.reply('ok')
+
+
+Client.add(dpl)
+
+
+def mre(event):
+    if not event.channel:
+        event.reply('channel is not set.')
         return
-    if "c" in Cfg.opts:
-        init(mods, Cfg.mod, Cfg.sets.dis, True)
-        csl = Console()
-        csl.start()
-        forever()
+    bot = Broker.get(event.orig)
+    if 'cache' not in dir(bot):
+        event.reply('bot is missing cache')
         return
-    if Cfg.otxt:
-        return cmnd(Cfg.otxt, print)
+    if event.channel not in bot.cache:
+        event.reply(f'no output in {event.channel} cache.')
+        return
+    for _x in range(3):
+        txt = bot.gettxt(event.channel)
+        if txt:
+            bot.say(event.channel, txt)
+    size = bot.size(event.channel)
+    event.reply(f'{size} more in cache')
 
 
-def wrapped():
-    wrap(main)
-    Errors.show()
+Client.add(mre)
 
 
-if __name__ == "__main__":
-    wrapped()
+def nme(event):
+    if len(event.args) != 2:
+        event.reply('nme <stringinurl> <name>')
+        return
+    selector = {'rss': event.args[0]}
+    for fnm, feed in find('rss', selector):
+        if feed:
+            feed.name = event.args[1]
+            sync(feed)
+    event.reply('ok')
+
+
+Client.add(nme)
+
+
+def pwd(event):
+    if len(event.args) != 2:
+        event.reply('pwd <nick> <password>')
+        return
+    arg1 = event.args[0]
+    arg2 = event.args[1]
+    txt = f'\x00{arg1}\x00{arg2}'
+    enc = txt.encode('ascii')
+    base = base64.b64encode(enc)
+    dcd = base.decode('ascii')
+    event.reply(dcd)
+
+
+Client.add(pwd)
+
+
+def rem(event):
+    if len(event.args) != 1:
+        event.reply('rem <stringinurl>')
+        return
+    selector = {'rss': event.args[0]}
+    for fnm, feed in find('rss', selector):
+        if feed:
+            feed.__deleted__ = True
+            sync(feed, fnm)
+    event.reply('ok')
+
+
+Client.add(rem)
+
+
+def res(event):
+    if len(event.args) != 1:
+        event.reply('res <stringinurl>')
+        return
+    selector = {'rss': event.args[0]}
+    for fnm, feed in find('rss', selector, deleted=True):
+        if feed:
+            feed.__deleted__ = False
+            sync(feed, fnm)
+    event.reply('ok')
+
+
+Client.add(res)
+
+
+def rss(event):
+    if not event.rest:
+        nrs = 0
+        for fnm, feed in find('rss'):
+            nrs += 1
+            elp = laps(time.time()-fntime(fnm))
+            txt = fmt(feed)
+            event.reply(f'{nrs} {txt} {elp}')
+        if not nrs:
+            event.reply('no rss feed found.')
+        return
+    url = event.args[0]
+    if 'http' not in url:
+        event.reply('i need an url')
+        return
+    for fnm, result in find('rss', {'rss': url}):
+        if result:
+            event.reply(f'already got {url}')
+            return
+    feed = Rss()
+    feed.rss = event.args[0]
+    sync(feed)
+    event.reply('ok')
+
+
+Client.add(rss)

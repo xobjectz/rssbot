@@ -44,8 +44,6 @@ def main():
     popen("rm -fRv .pytest_cache .test __pycache__")
     popen("rm -fRv lib/*.egg-info")
     popen("rm -fRv .*~ *~")
-    popen('rm -fRv docs/sbn*.rst')
-    popen('rm -fRv html')
     if "-f" in sys.argv:
         popen("rm -fRv store env .censor")
     loop(".", "rm -fRv *~")
