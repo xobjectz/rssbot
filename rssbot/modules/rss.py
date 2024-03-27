@@ -8,6 +8,7 @@
 
 import html.parser
 import re
+import time
 import urllib
 import urllib.request
 import _thread
@@ -17,12 +18,11 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 
 
-from ..default import Default
-from ..objects import Object, update
-from ..persist import Persist, find, last, sync
-from ..repeats import Repeater
-from ..runtime import Broker, spl
-from ..threads import launch
+from ..broker  import Broker
+from ..handler import Client
+from ..object  import Default, Object, fmt, spl, update
+from ..persist import Persist, find, fntime, laps, last, sync
+from ..thread  import Repeater, launch
 
 
 def init():
@@ -288,3 +288,91 @@ def unescape(text):
 
 def useragent(txt):
     return 'Mozilla/5.0 (X11; Linux x86_64) ' + txt
+
+
+def dpl(event):
+    if len(event.args) < 2:
+        event.reply('dpl <stringinurl> <item1,item2>')
+        return
+    setter = {'display_list': event.args[1]}
+    for fnm, feed in find('rss', {'rss': event.args[0]}):
+        if feed:
+            update(feed, setter)
+            sync(feed)
+    event.reply('ok')
+
+
+Client.add(dpl)
+
+
+def nme(event):
+    if len(event.args) != 2:
+        event.reply('nme <stringinurl> <name>')
+        return
+    selector = {'rss': event.args[0]}
+    for fnm, feed in find('rss', selector):
+        if feed:
+            feed.name = event.args[1]
+            sync(feed)
+    event.reply('ok')
+
+
+Client.add(nme)
+
+
+def rem(event):
+    if len(event.args) != 1:
+        event.reply('rem <stringinurl>')
+        return
+    selector = {'rss': event.args[0]}
+    for fnm, feed in find('rss', selector):
+        if feed:
+            feed.__deleted__ = True
+            sync(feed, fnm)
+    event.reply('ok')
+
+
+Client.add(rem)
+
+
+def res(event):
+    if len(event.args) != 1:
+        event.reply('res <stringinurl>')
+        return
+    selector = {'rss': event.args[0]}
+    for fnm, feed in find('rss', selector, deleted=True):
+        if feed:
+            feed.__deleted__ = False
+            sync(feed, fnm)
+    event.reply('ok')
+
+
+Client.add(res)
+
+
+def rss(event):
+    if not event.rest:
+        nrs = 0
+        for fnm, feed in find('rss'):
+            nrs += 1
+            elp = laps(time.time()-fntime(fnm))
+            txt = fmt(feed)
+            event.reply(f'{nrs} {txt} {elp}')
+        if not nrs:
+            event.reply('no rss feed found.')
+        return
+    url = event.args[0]
+    if 'http' not in url:
+        event.reply('i need an url')
+        return
+    for fnm, result in find('rss', {'rss': url}):
+        if result:
+            event.reply(f'already got {url}')
+            return
+    feed = Rss()
+    feed.rss = event.args[0]
+    sync(feed)
+    event.reply('ok')
+
+
+Client.add(rss)

@@ -7,6 +7,7 @@
 "internet relay chat"
 
 
+import base64
 import os
 import queue
 import socket
@@ -17,12 +18,12 @@ import time
 import _thread
 
 
-from ..default import Default
-from ..objects import Object
+from ..broker  import Broker
 from ..handler import Client, Event
-from ..runtime import Broker, Errors, debug
-from ..persist import Persist, last
-from ..threads import launch
+from ..errors  import Errors, debug
+from ..object  import Default, Object, edit, fmt, keys
+from ..persist import Persist, last, sync
+from ..thread  import launch
 
 
 NAME    = __file__.split(os.sep)[-3]
@@ -192,6 +193,7 @@ class IRC(Client, Output):
         self.register('ERROR', cb_error)
         self.register('LOG', cb_log)
         self.register('NOTICE', cb_notice)
+        self.register('PRIVMSG', cb_privmsg)
         self.register('QUIT', cb_quit)
         self.register("366", cb_ready)
         Broker.add(self)
@@ -562,8 +564,84 @@ def cb_notice(evt):
         txt = f'\001VERSION {NAME.upper()} 140 - {bot.cfg.username}\001'
         bot.docommand('NOTICE', evt.channel, txt)
 
+
+def cb_privmsg(evt):
+    bot = get(evt.orig)
+    if not bot.cfg.commands:
+        return
+    if evt.txt:
+        if evt.txt[0] in ['!',]:
+            evt.txt = evt.txt[1:]
+        elif evt.txt.startswith(f'{bot.cfg.nick}:'):
+            evt.txt = evt.txt[len(bot.cfg.nick)+1:]
+        else:
+            return
+        if evt.txt:
+            evt.txt = evt.txt[0].lower() + evt.txt[1:]
+        debug(f"command from {evt.origin}: {evt.txt}")
+        bot.command(evt)
+
+
 def cb_quit(evt):
     bot = get(evt.orig)
     debug(f"quit from {bot.cfg.server}")
     if evt.orig and evt.orig in bot.zelf:
         bot.stop()
+
+
+def cfg(event):
+    config = Config()
+    path = last(config)
+    if not event.sets:
+        event.reply(
+                    fmt(
+                        config,
+                        keys(config),
+                        skip='control,password,realname,sleep,username'.split(",")
+                       )
+                   )
+    else:
+        edit(config, event.sets)
+        sync(config, path)
+        event.reply('ok')
+
+
+Client.add(cfg)
+
+
+def mre(event):
+    if not event.channel:
+        event.reply('channel is not set.')
+        return
+    bot = Broker.get(event.orig)
+    if 'cache' not in dir(bot):
+        event.reply('bot is missing cache')
+        return
+    if event.channel not in bot.cache:
+        event.reply(f'no output in {event.channel} cache.')
+        return
+    for _x in range(3):
+        txt = bot.gettxt(event.channel)
+        if txt:
+            bot.say(event.channel, txt)
+    size = bot.size(event.channel)
+    event.reply(f'{size} more in cache')
+
+
+Client.add(mre)
+
+
+def pwd(event):
+    if len(event.args) != 2:
+        event.reply('pwd <nick> <password>')
+        return
+    arg1 = event.args[0]
+    arg2 = event.args[1]
+    txt = f'\x00{arg1}\x00{arg2}'
+    enc = txt.encode('ascii')
+    base = base64.b64encode(enc)
+    dcd = base.decode('ascii')
+    event.reply(dcd)
+
+
+Client.add(pwd)
