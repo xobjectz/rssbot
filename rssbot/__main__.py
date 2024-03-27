@@ -27,6 +27,7 @@ from .persist import Workdir
 
 Cfg         = Default()
 Cfg.mod     = "cmd,mod"
+Cfg.opts    = ""
 Cfg.name    = "rssbot"
 Cfg.version = "550"
 Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
