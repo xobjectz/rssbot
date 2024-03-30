@@ -194,7 +194,6 @@ class Parser:
         stop = False
         while not stop:
             index1 = text.find(f'<{token}', index)
-            print(index1)
             if index1 == -1:
                 break
             index1 += len(token) + 2
@@ -221,7 +220,6 @@ class Parser:
                     setattr(obj, itm, val)
                 else:
                     att = Parser.getattrs(line, toke)
-                    print(line, att)
                     if att:
                         if itm == "link":
                             itm = "href"
@@ -308,9 +306,16 @@ Client.add(dpl)
 
 
 def exp(event):
-    for fnm, feed in find('rss'):
-        print(fnm, feed)
-    event.reply("yo!")
+    event.reply(TEMPLATE)
+    nr = 0
+    for fnm, obj in find("rss"):
+        nr += 1
+        name = obj.name or f"url{nr}"
+        rss = f'<outline name={name} display_list={obj.display_list} xmlUrl="{obj.rss}"/>'
+        event.reply(" "*12 + rss)
+    event.reply(" "*8 + "</outline>")
+    event.reply("    <body>")
+    event.reply("</opml>")
 
 
 Client.add(exp)
@@ -329,22 +334,6 @@ def nme(event):
 
 
 Client.add(nme)
-
-
-def opm(event):
-    event.reply(TEMPLATE)
-    nr = 0
-    for fnm, obj in find("rss"):
-        nr += 1
-        name = obj.name or f"url{nr}"
-        rss = f'<outline name={name} display_list={obj.display_list} xmlUrl="{obj.rss}"/>'
-        event.reply(" "*12 + rss)
-    event.reply(" "*8 + "</outline>")
-    event.reply("    <body>")
-    event.reply("</opml>")
-
-
-Client.add(opm)
 
 
 def rem(event):

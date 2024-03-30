@@ -14,10 +14,10 @@ import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
-from otpcr.errors  import Errors, debug
-from otpcr.object  import Default, Object
-from otpcr.persist import Persist, Workdir
-from otpcr.thread  import launch
+from rssbot.errors  import Errors, debug
+from rssbot.object  import Default, Object
+from rssbot.persist import Persist, Workdir
+from rssbot.thread  import launch
 
 
 def init():

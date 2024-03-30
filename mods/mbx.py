@@ -11,9 +11,9 @@ import os
 import time
 
 
-from otpcr.handler import Client
-from otpcr.object  import Object, fmt, update
-from otpcr.persist import Persist, find, fntime, laps, sync
+from rssbot.handler import Client
+from rssbot.object  import Object, fmt, update
+from rssbot.persist import Persist, find, fntime, laps, sync
 
 
 MONTH = {

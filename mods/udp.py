@@ -13,10 +13,10 @@ import threading
 import time
 
 
-from otpcr.broker import Broker
-from otpcr.handler import Client
-from otpcr.object import Object
-from otpcr.thread import launch
+from rssbot.broker import Broker
+from rssbot.handler import Client
+from rssbot.object import Object
+from rssbot.thread import launch
 
 
 def init():

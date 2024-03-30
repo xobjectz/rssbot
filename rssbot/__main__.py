@@ -158,7 +158,6 @@ def main():
             time.sleep(1.0)
         return
     if "c" in Cfg.opts:
-        init(modules, Cfg.mod)
         init(mods, Cfg.mod)
         csl = Console()
         csl.start()
