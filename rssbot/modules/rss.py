@@ -332,7 +332,16 @@ Client.add(nme)
 
 
 def opm(event):
-    event.reply("yo!")
+    event.reply(TEMPLATE)
+    nr = 0
+    for fnm, obj in find("rss"):
+        nr += 1
+        name = obj.name or f"url{nr}"
+        rss = f'<outline name={name} display_list={obj.display_list} xmlUrl="{obj.rss}"/>'
+        event.reply(" "*12 + rss)
+    event.reply(" "*8 + "</outline>")
+    event.reply("    <body>")
+    event.reply("</opml>")
 
 
 Client.add(opm)
@@ -394,3 +403,11 @@ def rss(event):
 
 
 Client.add(rss)
+
+
+TEMPLATE = """<opml version="1.0">
+    <head>
+        <title>rssbot opml</title>
+    </head>
+    <body>
+        <outline title="rssbot opml" text="24/7 feed fetcher">"""
