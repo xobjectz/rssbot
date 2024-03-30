@@ -16,10 +16,10 @@ class TestOPML(unittest.TestCase):
 
     def test_opml(self):
         p = Parser()
-        res = p.parse(TXT, "outline", "text,xmlUrl")
+        res = p.parse(TXT, "outline", "title,type,text,xmlUrl")
         for item in res:
             print(item)
-        self.assertTrue(False)
+        self.assertTrue(len(res) == 5)
 
 
 TXT = """<opml version="1.0">

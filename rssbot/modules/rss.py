@@ -141,10 +141,10 @@ class Parser:
     @staticmethod
     def getvalue(line, attr):
         lne = ''
-        index1 = line.find(f' {attr}="')
+        index1 = line.find(f'{attr}="')
         if index1 == -1:
             return lne
-        index1 += len(attr) + 3
+        index1 += len(attr) + 2
         index2 = line.find('"', index1)
         if index2 == -1:
             index2 = line.find('"/>', index1)
@@ -193,7 +193,8 @@ class Parser:
         result = []
         stop = False
         while not stop:
-            index1 = text.find(f'<{token}>', index)
+            index1 = text.find(f'<{token}', index)
+            print(index1)
             if index1 == -1:
                 break
             index1 += len(token) + 2
@@ -219,7 +220,8 @@ class Parser:
                     val = striphtml(val)
                     setattr(obj, itm, val)
                 else:
-                    att = Parser.getattrs(line, itm)
+                    att = Parser.getattrs(line, toke)
+                    print(line, att)
                     if att:
                         if itm == "link":
                             itm = "href"
@@ -305,6 +307,15 @@ def dpl(event):
 Client.add(dpl)
 
 
+def exp(event):
+    for fnm, feed in find('rss'):
+        print(fnm, feed)
+    event.reply("yo!")
+
+
+Client.add(exp)
+
+
 def nme(event):
     if len(event.args) != 2:
         event.reply('nme <stringinurl> <name>')
@@ -318,6 +329,13 @@ def nme(event):
 
 
 Client.add(nme)
+
+
+def opm(event):
+    event.reply("yo!")
+
+
+Client.add(opm)
 
 
 def rem(event):
