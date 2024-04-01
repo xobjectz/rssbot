@@ -311,8 +311,8 @@ def exp(event):
     for fnm, obj in find("rss"):
         nr += 1
         name = obj.name or f"url{nr}"
-        rss = f'<outline name={name} display_list={obj.display_list} xmlUrl="{obj.rss}"/>'
-        event.reply(" "*12 + rss)
+        txt = f'<outline name={name} display_list={obj.display_list} xmlUrl="{obj.rss}"/>'
+        event.reply(" "*12 + txt)
     event.reply(" "*8 + "</outline>")
     event.reply("    <body>")
     event.reply("</opml>")
