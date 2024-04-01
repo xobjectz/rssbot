@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rssbot"
 description = "24/7 feed fetcher"
-version = "550"
+version = "551"
 authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
@@ -45,6 +45,13 @@ zip-safe=true
 "share/doc/rssbot" = [
     "README.rst"
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rssbot*"]
+exclude = ["tests*", "files*", "mods*"]
+namespaces = false
+
 
 [tool.setuptools.exclude-package-data]
 "*" = [
