@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
 # pylint: disable=C,R,W0105,W0201,W0212,W0613,E0401,E0402,E0611
@@ -26,22 +25,16 @@ from .persist import Workdir
 
 
 Cfg         = Default()
-Cfg.mod     = "cmd,mod"
+Cfg.mod     = "cmd,irc,mod,rss"
 Cfg.opts    = ""
 Cfg.name    = "rssbot"
-Cfg.version = "550"
+Cfg.version = "551"
 Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
 Workdir.wd = Cfg.wd
 
 
 from . import modules
-
-
-if os.path.exists("mods"):
-    import mods
-else:
-    mods = None
 
 
 dte = time.ctime(time.time()).replace("  ", " ")
@@ -141,8 +134,7 @@ def main():
     Client.add(ver)
     parse_cmd(Cfg, " ".join(sys.argv[1:]))
     if 'a' in Cfg.opts:
-        Cfg.mod = ",".join(mods.__dir__())
-        Cfg.mod += "," + ",".join(modules.__dir__())
+        Cfg.mod = "," + ",".join(modules.__dir__())
     if "v" in Cfg.opts:
         debug(f"{Cfg.name.upper()} {Cfg.opts.upper()} started {dte}")
     if "h" in Cfg.opts:
@@ -158,7 +150,7 @@ def main():
             time.sleep(1.0)
         return
     if "c" in Cfg.opts:
-        init(mods, Cfg.mod)
+        init(modules, Cfg.mod)
         csl = Console()
         csl.start()
         while 1:
