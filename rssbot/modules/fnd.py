@@ -7,8 +7,9 @@
 
 
 from ..command import Command
+from ..find    import find
 from ..object  import fmt
-from ..persist import find, long
+from ..persist import long
 from ..workdir import liststore, skel
 
 

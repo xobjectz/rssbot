@@ -21,17 +21,18 @@ import _thread
 from ..client  import Client, command
 from ..command import Command
 from ..default import Default
-from ..errors  import later
+from ..errors  import debug, later
 from ..event   import Event
+from ..find    import last
 from ..object  import Object, edit, fmt, keys
-from ..persist import last, sync, whitelist
+from ..persist import whitelist
 from ..thread  import launch
-
-
-from .broker import broker
+from ..utils   import getmain
+from ..workdir import sync
 
 
 NAME       = __file__.split(os.sep)[-3]
+broker     = getmain("broker")
 filterlist = ["PING", "PONG", "PRIVMSG"]
 saylock    = _thread.allocate_lock()
 
@@ -39,12 +40,11 @@ saylock    = _thread.allocate_lock()
 myirc = None
 
 
-def debug(txt):
+def dbg(txt):
     for flt in filterlist:
         if flt in txt:
             return
-    print(txt)
-
+    debug(txt)
 
 def init():
     global myirc
@@ -56,7 +56,7 @@ def init():
 
 
 def shutdown():
-    debug(f"IRC stopping {myirc}")
+    dbg(f"IRC stopping {myirc}")
     if myirc:
         myirc.state.pongcheck = True
         myirc.state.keeprunning = False
@@ -230,7 +230,7 @@ class IRC(Client, Output):
         self.state.nrconnect += 1
         self.events.connected.clear()
         if self.cfg.password:
-            debug("using SASL")
+            dbg("using SASL")
             self.cfg.sasl = True
             self.cfg.port = "6697"
             ctx = ssl.SSLContext(ssl.PROTOCOL_TLS)
@@ -280,8 +280,8 @@ class IRC(Client, Output):
                     ConnectionResetError
                    ) as ex:
                 self.state.error = str(ex)
-                debug(str(ex))
-            debug(f"sleeping {self.cfg.sleep} seconds")
+                dbg(str(ex))
+            dbg(f"sleeping {self.cfg.sleep} seconds")
             time.sleep(self.cfg.sleep)
         self.logon(server, nck)
 
@@ -327,7 +327,7 @@ class IRC(Client, Output):
             self.state.pongcheck = True
             self.docommand('PING', self.cfg.server)
             if self.state.pongcheck:
-                debug("failed pongcheck, restarting")
+                dbg("failed pongcheck, restarting")
                 self.state.pongcheck = False
                 self.state.keeprunning = False
                 self.events.connected.clear()
@@ -346,7 +346,7 @@ class IRC(Client, Output):
         rawstr = str(txt)
         rawstr = rawstr.replace('\u0001', '')
         rawstr = rawstr.replace('\001', '')
-        debug(txt)
+        dbg(txt)
         obj = Event()
         obj.args = []
         obj.rawstr = rawstr
@@ -421,7 +421,7 @@ class IRC(Client, Output):
                    ) as ex:
                 later(ex)
                 self.stop()
-                debug("handler stopped")
+                dbg("handler stopped")
                 evt = self.event(str(ex))
                 return evt
         try:
@@ -432,7 +432,7 @@ class IRC(Client, Output):
 
     def raw(self, txt):
         txt = txt.rstrip()
-        debug(txt)
+        dbg(txt)
         txt = txt[:500]
         txt += '\r\n'
         txt = bytes(txt, 'utf-8')
@@ -453,7 +453,7 @@ class IRC(Client, Output):
         self.state.nrsend += 1
 
     def reconnect(self):
-        debug(f"reconnecting to {self.cfg.server}")
+        dbg(f"reconnecting to {self.cfg.server}")
         try:
             self.disconnect()
         except (ssl.SSLError, OSError):
@@ -529,7 +529,7 @@ def cb_error(bot, evt):
         bot.state.nrerror = 0
     bot.state.nrerror += 1
     bot.state.error = evt.txt
-    debug(evt.txt)
+    dbg(evt.txt)
 
 
 def cb_h903(bot, evt):
@@ -576,12 +576,12 @@ def cb_privmsg(bot, evt):
             return
         if evt.txt:
             evt.txt = evt.txt[0].lower() + evt.txt[1:]
-        debug(f"command from {evt.origin}: {evt.txt}")
+        dbg(f"command from {evt.origin}: {evt.txt}")
         command(bot, evt)
 
 
 def cb_quit(bot, evt):
-    debug(f"quit from {bot.cfg.server}")
+    dbg(f"quit from {bot.cfg.server}")
     if evt.orig and evt.orig in bot.zelf:
         bot.stop()
 

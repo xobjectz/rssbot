@@ -12,7 +12,9 @@ import time
 from ..client  import laps
 from ..object  import Object
 from ..command import Command
-from ..persist import fntime, find, sync, whitelist
+from ..find import fntime, find
+from ..persist import whitelist
+from ..workdir import sync
 
 
 class NoDate(Exception):

@@ -7,11 +7,12 @@
 
 
 from ..command import Command
-from ..object import values
-from ..thread import name
+from ..object  import values
+from ..thread  import name
+from ..utils   import getmain
 
 
-from .broker import broker
+broker = getmain("broker")
 
 
 def flt(event):

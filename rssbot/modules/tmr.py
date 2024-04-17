@@ -14,13 +14,13 @@ import time as ttime
 from ..client  import laps
 from ..command import Command
 from ..event   import Event
+from ..find    import find
 from ..timer   import Timer
 from ..thread  import launch
-from ..persist import find, sync, whitelist
+from ..persist import whitelist
 from ..object  import update
-
-
-from .broker import broker
+from ..workdir import sync
+from ..utils   import getmain
 
 
 def init():
@@ -67,6 +67,7 @@ class NoDate(Exception):
     pass
 
 
+broker = getmain("broker")
 whitelist(Timer)
 
 

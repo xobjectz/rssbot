@@ -17,6 +17,18 @@ class Errors:
     errors = []
 
 
+    def out(txt):
+        "overload this."
+
+
+def debug(txt):
+    Errors.out(txt)
+
+
+def enable(func):
+    Errors.out = func
+
+
 def later(exc):
     "add an exception"
     excp = exc.with_traceback(exc.__traceback__)
@@ -41,7 +53,7 @@ def tostr(exc):
 def out(exc):
     "check if output function is set."
     txt = str(tostr(exc))
-    print(txt)
+    Errors.out(txt)
 
 
 def errors():

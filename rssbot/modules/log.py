@@ -12,7 +12,9 @@ import time
 from ..client  import laps
 from ..command import Command
 from ..object  import Object
-from ..persist import find, fntime, sync, whitelist
+from ..find    import find, fntime
+from ..workdir import  sync
+from ..persist  import whitelist
 
 
 class Log(Object):

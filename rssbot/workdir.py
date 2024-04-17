@@ -9,7 +9,7 @@
 import os
 
 
-from .object import Object, cdir
+from .object import Object, cdir, fqn, read, write
 
 
 class Workdir(Object):
@@ -19,14 +19,24 @@ class Workdir(Object):
     workdir = ""
 
 
-def getwd():
-    "return working directory."
-    return Workdir.workdir
+def fetch(obj, pth):
+    "read object from disk."
+    pth2 = store(pth)
+    read(obj, pth2)
+    return strip(pth)
 
 
-def setwd(path):
-    "set working directory."
-    Workdir.workdir = path
+def ident(obj):
+    "return an id for an object."
+    return os.path.join(
+                        fqn(obj),
+                        os.path.join(*str(datetime.datetime.now()).split())
+                       )
+
+
+def liststore():
+    "return types stored."
+    return os.listdir(store())
 
 
 def skel():
@@ -44,6 +54,10 @@ def strip(pth, nmr=3):
     return os.sep.join(pth.split(os.sep)[-nmr:])
 
 
-def liststore():
-    "return types stored."
-    return os.listdir(store())
+def sync(obj, pth=None):
+    "sync object to disk."
+    if pth is None:
+        pth = ident(obj)
+    pth2 = store(pth)
+    write(obj, pth2)
+    return pth

@@ -31,7 +31,7 @@ are manipulated instead of an object inherited from that class.
 """
 
 
-from ..object import Object, keys
+from .object import Object, keys
 
 
 rpr = object.__repr__
@@ -60,10 +60,3 @@ class Broker:
     def remove(self, obj):
         "remove object from broker"
         delattr(self.objs, rpr(obj))
-
-
-broker = Broker()
-
-
-def debug(txt):
-    print(txt)

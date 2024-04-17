@@ -21,13 +21,13 @@ from urllib.parse import quote_plus, urlencode
 from ..client   import laps, spl
 from ..command  import Command
 from ..default  import Default
+from ..find     import find, fntime, last
 from ..object   import Object, fmt, update, values
-from ..persist  import find, fntime, last, sync, whitelist
+from ..persist  import whitelist
 from ..repeater import Repeater
 from ..thread   import launch
-
-
-from .broker import broker
+from ..utils    import getmain
+from ..workdir  import sync
 
 
 def init():
@@ -37,10 +37,11 @@ def init():
     return fetcher
 
 
-fetchlock = _thread.allocate_lock()
-
-
 DEBUG = False
+
+
+broker    = getmain("broker")
+fetchlock = _thread.allocate_lock()
 
 
 TEMPLATE = """<opml version="1.0">
