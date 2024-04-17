@@ -25,8 +25,8 @@ from ..find     import find, fntime, last
 from ..object   import Object, fmt, update, values
 from ..persist  import whitelist
 from ..repeater import Repeater
+from ..runtime  import broker
 from ..thread   import launch
-from ..utils    import getmain
 from ..workdir  import sync
 
 
@@ -40,7 +40,6 @@ def init():
 DEBUG = False
 
 
-broker    = getmain("broker")
 fetchlock = _thread.allocate_lock()
 
 

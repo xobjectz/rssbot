@@ -26,13 +26,12 @@ from ..event   import Event
 from ..find    import last
 from ..object  import Object, edit, fmt, keys
 from ..persist import whitelist
+from ..runtime import broker
 from ..thread  import launch
-from ..utils   import getmain
 from ..workdir import sync
 
 
 NAME       = __file__.split(os.sep)[-3]
-broker     = getmain("broker")
 filterlist = ["PING", "PONG", "PRIVMSG"]
 saylock    = _thread.allocate_lock()
 

@@ -9,7 +9,6 @@
 
 import os
 import profile
-import shutil
 import sys
 import termios
 import time
@@ -25,7 +24,7 @@ from rssbot.broker  import Broker
 broker = Broker()
 
 
-from rssbot.client  import Client, cmnd, laps, parse_cmd
+from rssbot.client  import Client, laps, parse_cmd
 from rssbot.command import Command
 from rssbot.default import Default
 from rssbot.errors  import errors

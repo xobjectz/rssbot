@@ -8,11 +8,8 @@
 
 from ..command import Command
 from ..object  import values
+from ..runtime import broker
 from ..thread  import name
-from ..utils   import getmain
-
-
-broker = getmain("broker")
 
 
 def flt(event):

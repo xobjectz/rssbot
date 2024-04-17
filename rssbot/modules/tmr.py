@@ -15,12 +15,12 @@ from ..client  import laps
 from ..command import Command
 from ..event   import Event
 from ..find    import find
+from ..runtime import broker
 from ..timer   import Timer
 from ..thread  import launch
 from ..persist import whitelist
 from ..object  import update
 from ..workdir import sync
-from ..utils   import getmain
 
 
 def init():
@@ -67,7 +67,6 @@ class NoDate(Exception):
     pass
 
 
-broker = getmain("broker")
 whitelist(Timer)
 
 

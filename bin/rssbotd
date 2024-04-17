@@ -13,23 +13,14 @@ import os
 import pwd
 import readline # pylint: disable=W0611
 import sys
-import termios
 import time
 
 
-from rssbot.broker  import Broker
-
-
-broker = Broker()
-
-
-from rssbot.client  import Client, cmnd, parse_cmd, spl
+from rssbot.client  import spl
 from rssbot.command import Command
 from rssbot.default import Default
-from rssbot.errors  import debug, enable
-from rssbot.event   import Event
+from rssbot.errors  import enable, errors
 from rssbot.object  import cdir
-from rssbot.errors  import errors 
 from rssbot.workdir import Workdir, skel
 
 
@@ -100,7 +91,7 @@ def main():
     skel()
     Cfg.mod = "," + ",".join(modules.__dir__())
     Cfg.user = getpass.getuser()
-    daemon(Cfg.pidfile, "v" in Cfg.opts)
+    daemon(Cfg.pidfile, "-v" in sys.argv)
     privileges(Cfg.user)
     init(modules, Cfg.mod)
     while 1:
@@ -109,3 +100,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    errors()
