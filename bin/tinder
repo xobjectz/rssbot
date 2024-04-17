@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+# This file is placed in the Public Domain.
+#
+# pylint: disable=C,R,W0105
+
+
+"created clients"
+
+
+import os
+import profile
+import shutil
+import sys
+import termios
+import time
+import _thread
+
+
+sys.path.insert(0, os.getcwd())
+
+
+from rssbot.broker  import Broker
+
+
+broker = Broker()
+
+
+from rssbot.client  import Client, cmnd, laps, parse_cmd
+from rssbot.command import Command
+from rssbot.default import Default
+from rssbot.errors  import errors
+from rssbot.event   import Event
+from rssbot.object  import Object, keys
+from rssbot.thread  import launch
+from rssbot.workdir import Workdir
+
+
+from rssbot import modules
+
+
+Cfg             = Default()
+Cfg.debug       = True
+Cfg.name        = "tinder"
+Cfg.silent      = False
+Cfg.skip        = ["debug",]
+Cfg.version     = "110"
+Cfg.wd          = ".test"
+Workdir.workdir = Cfg.wd
+
+
+LAP = 1
+NRS = 1
+NRCOMMAND = 1
+PERCALL = 1
+STARTTIME = time.time()
+
+
+events = []
+paylock = _thread.allocate_lock()
+
+
+param = Object()
+param.cfg = [
+    "server=localhost",
+    "nick=mekker",
+    "port=6697",
+    "commands=true",
+    ""]
+param.cmd = [""]
+param.dpl = ["hnrss title,summary,link"]
+param.mre = ["2"]
+param.nme = ["hnrss hackernews"]
+param.pwd = ["bart bla"]
+#param.rem = ["hnrss"]
+param.rss = ["http://hnrss.org/newest"]
+param.ver = [""]
+
+
+class CLI(Client):
+
+    "CLI"
+
+    def say(self, _channel, txt):
+        if "v" not in Cfg.opts:
+            return
+        self.raw(txt)
+
+    def raw(self, txt):
+        cprint(txt)
+
+
+def consume(evts):
+    "wait for events."
+    fixed = []
+    res = []
+    for evt in evts:
+        res.append(evt.wait())
+        fixed.append(evt)
+    for fff in fixed:
+        try:
+            evts.remove(fff)
+        except ValueError:
+            continue
+    return res
+
+
+def cprint(txt):
+    "flush on print."
+    print(txt.encode('utf-8', 'replace').decode())
+    sys.stdout.flush()
+
+
+def payload(clt):
+    "do payload."
+    cmds = sorted(list(keys(Command.cmds)))
+    #random.shuffle(cmds)
+    with paylock:
+        nmr = 0
+        for cmd in cmds:
+            for ex in getattr(param, cmd, [""]):
+                evt = Event()
+                evt.orig = object.__repr__(clt)
+                evt.txt = cmd + " " + ex
+                evt.type = "command"
+                clt.put(evt)
+                events.append(evt)
+                nmr += 1
+        return nmr
+
+
+def wrap(func):
+    "reset terminal."
+    old2 = None
+    try:
+        old2 = termios.tcgetattr(sys.stdin.fileno())
+    except termios.error:
+        pass
+    try:
+        func()
+    except (KeyboardInterrupt, EOFError):
+        print("")
+    finally:
+        if old2:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old2)
+
+
+def main():
+    "main"
+    nrs = Cfg.index or 1
+    nrcommand = len(Command.cmds) or 1
+    thrs = []
+    cli = CLI()
+    cli.start()
+    for _nr in range(nrs):
+        thrs.append(launch(payload, cli))
+    for thr in thrs:
+        thr.join()
+    consume(events)
+    endtime = time.time()
+    lap = laps(endtime-STARTTIME)
+    percall = (endtime-STARTTIME)/(nrs*nrcommand)
+    print(f"{lap} {nrs} {nrcommand} {percall}")
+
+
+if __name__ == "__main__":
+    parse_cmd(Cfg, " ".join(sys.argv[1:]))
+    dte = time.ctime(time.time()).replace("  ", " ")
+    cprint(f"{Cfg.name.upper()} {Cfg.opts.upper()} started {dte}")
+    Cfg.mod =  ",".join(modules.__dir__())
+    if "p" in Cfg.opts:
+        profile.runctx(main.__code__, globals(), locals())
+    else:
+        wrap(main)
+    errors()
