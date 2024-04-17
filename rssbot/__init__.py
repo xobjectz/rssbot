@@ -11,6 +11,7 @@ from .command  import *
 from .default  import *
 from .errors   import *
 from .event    import *
+from .find     import *
 from .handler  import *
 from .persist  import *
 from .repeater import *

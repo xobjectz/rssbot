@@ -17,6 +17,7 @@ class Errors:
     errors = []
 
 
+    @staticmethod
     def out(txt):
         "overload this."
 
