@@ -1,6 +1,6 @@
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C,R,W0613,E0402
+# pylint: disable=C,R,W0613,E0402,W0105
 
 
 "genocide model of the netherlands"
@@ -356,7 +356,7 @@ def cbstats(evt):
                                                                laps(needed),
                                                                nryear,
                                                               )
-        for bot in Broker.all():
+        for bot in values(broker.objs):
             bot.announce(txt)
 
 

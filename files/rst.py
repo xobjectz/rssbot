@@ -102,7 +102,7 @@ class RESTHandler(BaseHTTPRequestHandler):
                 txt += f'<a href="http://{Config.hostname}:{Config.port}/{fnm}">{fnm}</a>\n'
             self.send(html(txt.strip()))
             return
-        fnm = Workdir.wd + os.sep + "store" + os.sep + self.path
+        fnm = Workdir.workdir + os.sep + "store" + os.sep + self.path
         try:
             f = open(fnm, "r", encoding="utf-8")
             txt = f.read()

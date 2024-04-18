@@ -12,7 +12,7 @@ import time
 
 
 from rssbot.object  import Object, fmt, update
-from rssbot.client  import Client, laps
+from rssbot.client  import laps
 from rssbot.command import Command
 from rssbot.find    import find, fntime
 from rssbot.persist import whitelist
