@@ -6,7 +6,7 @@
 "available modules"
 
 
-from ..command import Command
+from rssbot.command import Command
 
 
 from . import __dir__

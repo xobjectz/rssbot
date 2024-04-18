@@ -7,14 +7,24 @@
 "modules"
 
 
-from . import mbx, mdl, rst, udp, wsd
+from . import err, flt, fnd, log, mbx, mdl, mod, req, rst, tdo, thr, tmr
+from . import udp, wsd
+
 
 
 def __dir__():
     return (
+       'err',
+       'flt',
+       'fnd',
+       'log',
        'mbx',
        'mdl',
+       'mod',
+       'req',
        'rst',
+       'tdo',
+       'thr',
        'udp',
        'wsd'
 

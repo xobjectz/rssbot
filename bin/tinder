@@ -31,8 +31,8 @@ from rssbot.workdir import Workdir
 from rssbot import modules
 
 
-if os.path.exists("mods"):
-    import mods
+if os.path.exists("files"):
+    import files as mods
 else:
     mods = None
 
