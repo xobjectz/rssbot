@@ -38,7 +38,7 @@ script-files = [
     "bin/rssbot",
     "bin/rssbotd"
 ]
-zip-safe=true
+zip-safe=false
 
 
 [tool.setuptools.data-files]
