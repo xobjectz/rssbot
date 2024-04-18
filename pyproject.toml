@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools>=43.0.0",
+    "setuptools>=64.0.0",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rssbot"
 description = "24/7 feed fetcher"
-version = "552"
+version = "553"
 authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
@@ -30,7 +30,7 @@ classifiers = [
 "source" = "https://github.com/xobjectz/rssbot"
 
 [tools.setuptools]
-packages = [
+packages=[
     "rssbot",
     "rssbot.modules"
 ]
@@ -38,17 +38,9 @@ script-files = [
     "bin/rssbot",
     "bin/rssbotd"
 ]
-zip-safe=false
-
+zip-safe=true
 
 [tool.setuptools.data-files]
 "share/doc/rssbot" = [
     "README.rst"
 ]
-
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["bin/rssbot", "bin/rssbotd", "rssbot*"]
-exclude = ["tests*", "files*", "mods*"]
-namespaces = false
