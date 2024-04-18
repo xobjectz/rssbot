@@ -30,13 +30,13 @@ classifiers = [
 "source" = "https://github.com/xobjectz/rssbot"
 
 [tools.setuptools]
-script-files = [
-    'bin/rssbot',
-    'bin/rssbotd'
-]
 packages = [
     "rssbot",
     "rssbot.modules"
+]
+script-files = [
+    "bin/rssbot",
+    "bin/rssbotd"
 ]
 zip-safe=true
 
@@ -46,16 +46,9 @@ zip-safe=true
     "README.rst"
 ]
 
+
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["rssbot*"]
+include = ["bin/rssbot", "bin/rssbotd", "rssbot*"]
 exclude = ["tests*", "files*", "mods*"]
 namespaces = false
-
-
-[tool.setuptools.exclude-package-data]
-"*" = [
-       "env*",
-       "html*",
-       "test*"
-      ]
