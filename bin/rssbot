@@ -17,33 +17,33 @@ import termios
 import time
 
 
-from rssbot.broker  import Broker
-
-
-broker = Broker()
-
-
 from rssbot.client  import Client, cmnd, parse_cmd, spl
 from rssbot.command import Command
 from rssbot.default import Default
-from rssbot.errors  import debug, enable
+from rssbot.errors  import debug, enable, errors
 from rssbot.event   import Event
 from rssbot.object  import cdir
-from rssbot.errors  import errors 
+from rssbot.runtime  import broker
 from rssbot.workdir import Workdir, skel
 
 
+from rssbot import modules
+
+
+if os.path.exists("mods"):
+    import mods
+else:
+    mods = None
+
+
 Cfg             = Default()
-Cfg.mod         = "cmd,irc,mod,rss"
+Cfg.mod         = "cmd,mod"
 Cfg.opts        = ""
 Cfg.name        = "rssbot"
 Cfg.version     = "552"
 Cfg.wd          = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
 Workdir.workdir = Cfg.wd
-
-
-from rssbot import modules
 
 
 dte = time.ctime(time.time()).replace("  ", " ")
@@ -98,11 +98,9 @@ def daemon(pidfile, verbose=False):
         fds.write(str(os.getpid()))
 
 
-def init(pkg, modstr, disable=""):
+def init(pkg, modstr):
     mds = []
     for modname in spl(modstr):
-        if modname in spl(disable):
-            continue
         module = getattr(pkg, modname, None)
         if not module:
             continue
@@ -143,7 +141,7 @@ def main():
     skel()
     parse_cmd(Cfg, " ".join(sys.argv[1:]))
     if 'a' in Cfg.opts:
-        Cfg.mod = "," + ",".join(modules.__dir__())
+        Cfg.mod = ",".join(modules.__dir__())
     if "v" in Cfg.opts:
         debug(f"{Cfg.name.upper()} {Cfg.opts.upper()} started {dte}")
     if "h" in Cfg.opts:
@@ -160,6 +158,9 @@ def main():
         return
     if "c" in Cfg.opts:
         init(modules, Cfg.mod)
+        if mods:
+            Cfg.mod += "," + ",".join(mods.__dir__())
+            init(mods, Cfg.mod)
         csl = Console()
         csl.start()
         while 1:
