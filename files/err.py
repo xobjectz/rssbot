@@ -6,8 +6,8 @@
 "status of bots"
 
 
-from ..command import Command
-from ..errors  import Errors, tostr
+from rssbot.command import Command
+from rssbot.errors  import Errors, tostr
 
 
 def err(event):

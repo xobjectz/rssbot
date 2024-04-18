@@ -10,8 +10,8 @@ import threading
 import time
 
 
-from ..client import Command, laps
-from ..object import Object, update
+from rssbot.client import Command, laps
+from rssbot.object import Object, update
 
 
 STARTTIME = time.time()

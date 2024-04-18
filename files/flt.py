@@ -6,10 +6,10 @@
 "fleet"
 
 
-from ..command import Command
-from ..object  import values
-from ..runtime import broker
-from ..thread  import name
+from rssbot.command import Command
+from rssbot.object  import values
+from rssbot.runtime import broker
+from rssbot.thread  import name
 
 
 def flt(event):
