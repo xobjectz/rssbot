@@ -78,7 +78,7 @@ rss
 
 SYSTEMD
 
-save the following it in /etc/systems/system/rssbot.service and
+save the following it in /etc/systemd/system/rssbot.service and
 replace "<user>" with the user running pipx
 
 ::
