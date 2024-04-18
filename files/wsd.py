@@ -189,7 +189,7 @@
 from random import SystemRandom
 
 
-from objr.handler import Client
+from rssbot.command import Command
 
 
 rand = SystemRandom()
@@ -199,4 +199,4 @@ def wsd(event):
     event.reply(rand.choice(__doc__.split("\n")).strip()[2:])
 
 
-Client.add(wsd)
+Command.add(wsd)

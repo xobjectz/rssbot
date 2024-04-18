@@ -13,15 +13,10 @@ import threading
 import time
 
 
-
-from objx import Object
-from objr import Client, launch
-
-
-from . import getmain
-
-
-broker = getmain("broker")
+from rssbot.object  import Object
+from rssbot.command import Command
+from rssbot.runtime import broker
+from rssbot.thread  import launch
 
 
 def init():
@@ -52,7 +47,7 @@ class UDP(Object):
     def output(self, txt, addr=None):
         if addr:
             Cfg.addr = addr
-        for bot in Broker.all():
+        for bot in broker.all():
             bot.announce(txt.replace("\00", ""))
 
     def loop(self):
@@ -123,4 +118,4 @@ def udp(event):
             break
 
 
-Client.add(udp)
+Command.add(udp)

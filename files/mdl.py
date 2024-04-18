@@ -10,22 +10,20 @@ import datetime
 import time
 
 
-
-from objx import Object, construct, keys, values
-from objr import Event, Repeater, laps, launch
-
-
-from . import getmain
-
-
-broker = getmain("broker")
+from rssbot.client   import laps
+from rssbot.command  import Command
+from rssbot.event    import Event
+from rssbot.object   import Object, construct, keys, values
+from rssbot.repeater import Repeater
+from rssbot.runtime  import broker
+from rssbot.thread   import launch
 
 
-def __dir__():
-    return (
-            'init',
-            'now'
-           ) 
+DAY = 24*60*60
+YEAR = 365*DAY
+SOURCE = "https://github.com/bthate/genocide"
+STARTDATE = "2020-01-01 00:00:00"
+STARTTIME = time.mktime(time.strptime(STARTDATE, "%Y-%m-%d %H:%M:%S"))
 
 
 def init():
@@ -40,12 +38,6 @@ def init():
             repeater.start()
     launch(daily, name="daily")
     
-
-DAY = 24*60*60
-YEAR = 365*DAY
-SOURCE = "https://github.com/bthate/genocide"
-STARTDATE = "2020-01-01 00:00:00"
-STARTTIME = time.mktime(time.strptime(STARTDATE, "%Y-%m-%d %H:%M:%S"))
 
 
 oor = """"Totaal onderliggende doodsoorzaken (aantal)";
@@ -389,6 +381,19 @@ def now(event):
         event.reply(txt)
     else:
         event.reply("not needed")
+
+
+Command.add(now)
+
+
+"interface"
+
+
+def __dir__():
+    return (
+            'init',
+            'now'
+           ) 
 
 
 def boot():

@@ -14,8 +14,12 @@ import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
-from objx import Default, Object, Persist, Workdir
-from objr import Errors, debug, launch
+from rssbot.default import Default
+from rssbot.errors  import debug, later
+from rssbot.find    import fns
+from rssbot.object  import Object
+from rssbot.workdir import Workdir
+from rssbot.thread  import launch
 
 
 def init():
@@ -69,7 +73,7 @@ class REST(HTTPServer, Object):
     def error(self, request, addr):
         exctype, excvalue, tb = sys.exc_info()
         exc = exctype(excvalue)
-        Errors.add(exc)
+        later(exc)
         debug('%s %s' % (addr, excvalue))
 
 
@@ -94,7 +98,7 @@ class RESTHandler(BaseHTTPRequestHandler):
         if self.path == "/":
             self.write_header("text/html")
             txt = ""
-            for fnm in Persist.fns():
+            for fnm in fns():
                 txt += f'<a href="http://{Config.hostname}:{Config.port}/{fnm}">{fnm}</a>\n'
             self.send(html(txt.strip()))
             return
@@ -107,7 +111,7 @@ class RESTHandler(BaseHTTPRequestHandler):
             self.send(html(txt))
         except (TypeError, FileNotFoundError, IsADirectoryError) as ex:
             self.send_response(404)
-            Errors.add(ex)
+            later(ex)
             self.end_headers()
 
     def log(self, code):

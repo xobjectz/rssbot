@@ -11,8 +11,12 @@ import os
 import time
 
 
-from objx import Object, fmt, update
-from objr import Client, Persist, find, fntime, laps, sync
+from rssbot.object  import Object, fmt, update
+from rssbot.client  import Client, laps
+from rssbot.command import Command
+from rssbot.find    import find, fntime
+from rssbot.persist import whitelist
+from rssbot.workdir import sync
 
 
 MONTH = {
@@ -38,7 +42,7 @@ class Email(Object):
         self.text = ""
 
 
-Persist.add(Email)
+whitelist(Email)
 
 
 def to_date(date):
@@ -92,7 +96,7 @@ def cor(event):
         event.reply("%s %s %s" % (nr, fmt(email, txt, plain=True), laps(time.time() - fntime(email.__stp__))))
 
 
-Client.add(cor)
+Command.add(cor)
 
 
 def eml(event):
@@ -106,7 +110,7 @@ def eml(event):
             event.reply("%s %s %s" % (nr, fmt(o, "From,Subject"), laps(time.time() - fntime(fn))))
 
 
-Client.add(eml)
+Command.add(eml)
 
 
 def mbx(event):
@@ -139,4 +143,4 @@ def mbx(event):
         event.reply("ok %s" % nr)
 
 
-Client.add(mbx)
+Command.add(mbx)
