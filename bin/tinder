@@ -18,23 +18,31 @@ import _thread
 sys.path.insert(0, os.getcwd())
 
 
-from rssbot.broker  import Broker
-
-
-broker = Broker()
-
-
 from rssbot.client  import Client, laps, parse_cmd
 from rssbot.command import Command
 from rssbot.default import Default
 from rssbot.errors  import errors
 from rssbot.event   import Event
 from rssbot.object  import Object, keys
+from rssbot.runtime import broker
 from rssbot.thread  import launch
 from rssbot.workdir import Workdir
 
 
 from rssbot import modules
+
+
+if os.path.exists("mods"):
+    import mods
+else:
+    mods = None
+
+
+LAP = 1
+NRS = 1
+NRCOMMAND = 1
+PERCALL = 1
+STARTTIME = time.time()
 
 
 Cfg             = Default()
@@ -45,13 +53,6 @@ Cfg.skip        = ["debug",]
 Cfg.version     = "110"
 Cfg.wd          = ".test"
 Workdir.workdir = Cfg.wd
-
-
-LAP = 1
-NRS = 1
-NRCOMMAND = 1
-PERCALL = 1
-STARTTIME = time.time()
 
 
 events = []
@@ -80,11 +81,13 @@ class CLI(Client):
     "CLI"
 
     def say(self, _channel, txt):
+        "echo on verbose."
         if "v" not in Cfg.opts:
             return
         self.raw(txt)
 
     def raw(self, txt):
+        "print to screen."
         cprint(txt)
 
 
@@ -166,6 +169,8 @@ if __name__ == "__main__":
     dte = time.ctime(time.time()).replace("  ", " ")
     cprint(f"{Cfg.name.upper()} {Cfg.opts.upper()} started {dte}")
     Cfg.mod =  ",".join(modules.__dir__())
+    if mods:
+        Cfg.mod += ",".join(mods.__dir__())
     if "p" in Cfg.opts:
         profile.runctx(main.__code__, globals(), locals())
     else:
