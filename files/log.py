@@ -9,12 +9,12 @@
 import time
 
 
-from ..client  import laps
-from ..command import Command
-from ..object  import Object
-from ..find    import find, fntime
-from ..workdir import  sync
-from ..persist  import whitelist
+from rssbot.client  import laps
+from rssbot.command import Command
+from rssbot.object  import Object
+from rssbot.find    import find, fntime
+from rssbot.workdir import  sync
+from rssbot.persist import whitelist
 
 
 class Log(Object):

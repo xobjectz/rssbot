@@ -9,12 +9,12 @@
 import time
 
 
-from ..client  import laps
-from ..object  import Object
-from ..command import Command
-from ..find import fntime, find
-from ..persist import whitelist
-from ..workdir import sync
+from rssbot.client  import laps
+from rssbot.object  import Object
+from rssbot.command import Command
+from rssbot.find import fntime, find
+from rssbot.persist import whitelist
+from rssbot.workdir import sync
 
 
 class NoDate(Exception):

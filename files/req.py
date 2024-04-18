@@ -79,7 +79,7 @@ p.s.
 """
 
 
-from ..command import Command
+from rssbot.command import Command
 
 
 def req(event):

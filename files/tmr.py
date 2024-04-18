@@ -11,16 +11,16 @@ import re
 import time as ttime
 
 
-from ..client  import laps
-from ..command import Command
-from ..event   import Event
-from ..find    import find
-from ..runtime import broker
-from ..timer   import Timer
-from ..thread  import launch
-from ..persist import whitelist
-from ..object  import update
-from ..workdir import sync
+from rssbot.client  import laps
+from rssbot.command import Command
+from rssbot.event   import Event
+from rssbot.find    import find
+from rssbot.runtime import broker
+from rssbot.timer   import Timer
+from rssbot.thread  import launch
+from rssbot.persist import whitelist
+from rssbot.object  import update
+from rssbot.workdir import sync
 
 
 def init():

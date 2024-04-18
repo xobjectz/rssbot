@@ -6,11 +6,11 @@
 "locate"
 
 
-from ..command import Command
-from ..find    import find
-from ..object  import fmt
-from ..persist import long
-from ..workdir import liststore, skel
+from rssbot.command import Command
+from rssbot.find    import find
+from rssbot.object  import fmt
+from rssbot.persist import long
+from rssbot.workdir import liststore, skel
 
 
 def fnd(event):
