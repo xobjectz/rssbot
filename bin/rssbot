@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C,R,W0105,W0201,W0212,W0613,E0401,E0402,E0611
+# pylint: disable=C,R,W0105,W0201,W0212,W0613,E0401,E0402,W0611
 # ruff: noqa: E402
 
 
@@ -11,7 +11,7 @@
 import getpass
 import os
 import pwd
-import readline # pylint: disable=W0611
+import readline
 import sys
 import termios
 import time
