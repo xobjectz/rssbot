@@ -12,6 +12,7 @@ from . import err,flt,fnd,thr
 def __dir__():
     return (
        'cmd',
+       'err',
        'irc',
        'log',
        'req',

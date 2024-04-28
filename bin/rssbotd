@@ -8,7 +8,6 @@
 import getpass
 import os
 import pwd
-import readline # pylint: disable=W0611
 import sys
 import time
 
@@ -16,18 +15,24 @@ import time
 from rssbot.client  import spl
 from rssbot.command import add
 from rssbot.default import Default
-from rssbot.errors  import enable, errors
+from rssbot.errors  import enable, errors, later
 from rssbot.object  import cdir
 from rssbot.workdir import Workdir, skel
+
+
+from rssbot.whitelist import scan as scancls
 
 
 Cfg             = Default()
 Cfg.mod         = "cmd,irc,rss"
 Cfg.opts        = ""
-Cfg.name        = "rssbot"
 Cfg.version     = "555"
+Cfg.name        = "rssbot"
+Cfg.user        = getpass.getuser()
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
+
+
 Workdir.workdir = Cfg.wdr
 
 
@@ -61,17 +66,20 @@ def daemon(ppidfile, verbose=False):
 
 
 def init(pkg, modstr, disable=""):
-    "start modules."
+    "start modules"
     mds = []
-    for modnam in spl(modstr):
-        if modnam in spl(disable):
+    for modname in spl(modstr):
+        if doskip(modname, disable):
             continue
-        module = getattr(pkg, modnam, None)
-        if not module:
+        mod = getattr(pkg, modname, None)
+        if not mod:
             continue
-        if "init" in dir(module):
-            module.init()
-            mds.append(module)
+        if "init" in dir(mod):
+            try:
+                mod.init()
+                mds.append(mod)
+            except Exception as ex: # pylint: disable=W0718
+                later(ex)
     return mds
 
 
@@ -80,6 +88,28 @@ def privileges(username):
     pwnam = pwd.getpwnam(username)
     os.setgid(pwnam.pw_gid)
     os.setuid(pwnam.pw_uid)
+
+
+def scan(pkg, modstr, disable=""):
+    "scan modules for commands and classes"
+    mds = []
+    for modname in spl(modstr):
+        if doskip(modname, disable):
+            continue
+        module = getattr(pkg, modname, None)
+        if not module:
+            continue
+        #scancmd(module)
+        scancls(module)
+    return mds
+
+
+def doskip(name, skipp):
+    "check for skipping"
+    for skp in spl(skipp):
+        if skp in name:
+            return True
+    return False
 
 
 def ver(event):
@@ -92,8 +122,7 @@ def main():
     add(ver)
     enable(print)
     skel()
-    Cfg.mod = "," + ",".join(modules.__dir__())
-    Cfg.user = getpass.getuser()
+    scan(modules, Cfg.mod)
     daemon(Cfg.pidfile, "-v" in sys.argv)
     privileges(Cfg.user)
     init(modules, Cfg.mod)
