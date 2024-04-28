@@ -5,22 +5,16 @@
 "main"
 
 
-import getpass
 import os
 import pwd
-import readline
 import sys
-import termios
 import time
 
 
-from rssbot.client  import Client, cmnd, parse_cmd, spl
+from rssbot.client  import cmnd, parse_cmd, spl
 from rssbot.command import add
 from rssbot.default import Default
-from rssbot.errors  import debug, enable, errors, later
-from rssbot.event   import Event
-from rssbot.object  import cdir
-from rssbot.runtime import broker
+from rssbot.errors  import enable, errors
 from rssbot.workdir import Workdir, skel
 
 
