@@ -17,7 +17,7 @@ import time
 
 
 from rssbot.client  import spl
-from rssbot.command import Command
+from rssbot.command import add
 from rssbot.default import Default
 from rssbot.errors  import enable, errors
 from rssbot.object  import cdir
@@ -86,7 +86,7 @@ def ver(event):
 
 
 def main():
-    Command.add(ver)
+    add(ver)
     enable(print)
     skel()
     Cfg.mod = "," + ",".join(modules.__dir__())
