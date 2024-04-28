@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105,W0201,W0212,W0613,E0401,E0402,E0611
-# ruff: noqa: E402
 
 
 "daemon"
@@ -25,48 +22,51 @@ from rssbot.workdir import Workdir, skel
 
 
 Cfg             = Default()
-Cfg.mod         = "cmd,irc,mod,rss"
+Cfg.mod         = "cmd,irc,rss"
 Cfg.opts        = ""
 Cfg.name        = "rssbot"
-Cfg.version     = "552"
-Cfg.wd          = os.path.expanduser(f"~/.{Cfg.name}")
-Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
-Workdir.workdir = Cfg.wd
+Cfg.version     = "555"
+Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
+Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
+Workdir.workdir = Cfg.wdr
 
 
-from rssbot import modules
+from rssbot import modules # pylint: disable=C0413
 
 
-def daemon(pidfile, verbose=False):
+def daemon(ppidfile, verbose=False):
+    "run in the background."
+    # pylint: disable=W0212
     pid = os.fork()
     if pid != 0:
         os._exit(0)
     os.setsid()
-    pid2 = os.fork()
-    if pid2 != 0:
+    pid22 = os.fork()
+    if pid22 != 0:
         os._exit(0)
     if not verbose:
-        with open('/dev/null', 'r', encoding="utf-8") as sis:
-            os.dup2(sis.fileno(), sys.stdin.fileno())
-        with open('/dev/null', 'a+', encoding="utf-8") as sos:
-            os.dup2(sos.fileno(), sys.stdout.fileno())
-        with open('/dev/null', 'a+', encoding="utf-8") as ses:
-            os.dup2(ses.fileno(), sys.stderr.fileno())
+        with open('/dev/null', 'r', encoding="utf-8") as siss:
+            os.dup2(siss.fileno(), sys.stdin.fileno())
+        with open('/dev/null', 'a+', encoding="utf-8") as soss:
+            os.dup2(soss.fileno(), sys.stdout.fileno())
+        with open('/dev/null', 'a+', encoding="utf-8") as sess:
+            os.dup2(sess.fileno(), sys.stderr.fileno())
     os.umask(0)
     os.chdir("/")
-    if os.path.exists(pidfile):
-        os.unlink(pidfile)
-    cdir(os.path.dirname(pidfile))
-    with open(pidfile, "w", encoding="utf-8") as fds:
-        fds.write(str(os.getpid()))
+    if os.path.exists(ppidfile):
+        os.unlink(ppidfile)
+    cdir(os.path.dirname(ppidfile))
+    with open(ppidfile, "w", encoding="utf-8") as fdss:
+        fdss.write(str(os.getpid()))
 
 
 def init(pkg, modstr, disable=""):
+    "start modules."
     mds = []
-    for modname in spl(modstr):
-        if modname in spl(disable):
+    for modnam in spl(modstr):
+        if modnam in spl(disable):
             continue
-        module = getattr(pkg, modname, None)
+        module = getattr(pkg, modnam, None)
         if not module:
             continue
         if "init" in dir(module):
@@ -76,16 +76,19 @@ def init(pkg, modstr, disable=""):
 
 
 def privileges(username):
+    "lower privileges."
     pwnam = pwd.getpwnam(username)
     os.setgid(pwnam.pw_gid)
     os.setuid(pwnam.pw_uid)
 
 
 def ver(event):
+    "show version."
     event.reply(f"{Cfg.name.upper()} {Cfg.version}")
 
 
 def main():
+    "main"
     add(ver)
     enable(print)
     skel()
