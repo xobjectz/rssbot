@@ -1,6 +1,4 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105
 
 
 "event"
@@ -12,7 +10,7 @@ import threading
 from .default import Default
 
 
-class Event(Default):
+class Event(Default): # pylint: disable=R0902
 
     "Event"
 
@@ -40,3 +38,9 @@ class Event(Default):
             self._thr.join()
         self._ready.wait()
         return self.result
+
+
+def __dir__():
+    return (
+        'Event',
+    )

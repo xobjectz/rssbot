@@ -1,6 +1,4 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105
 
 
 "locate"
@@ -10,10 +8,10 @@ import os
 import time
 
 
-from .default import Default
-from .object  import fqn, search, update
-from .persist import long
-from .workdir import fetch, store, strip
+from .default   import Default
+from .object    import fqn, search, update
+from .whitelist import long
+from .workdir   import fetch, store, strip
 
 
 def fns(mtc=""):
@@ -75,3 +73,12 @@ def last(obj, selector=None):
         update(obj, inp[-1])
         res = inp[0]
     return res
+
+
+def __dir__():
+    return (
+        'fns',
+        'fntime',
+        'find',
+        'last'
+    )

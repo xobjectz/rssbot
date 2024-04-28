@@ -1,6 +1,4 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105
 
 
 "rich site syndicate"
@@ -18,16 +16,14 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 
 
-from ..client   import laps, spl
-from ..command  import Command
-from ..default  import Default
-from ..find     import find, fntime, last
-from ..object   import Object, fmt, update, values
-from ..persist  import whitelist
-from ..repeater import Repeater
-from ..runtime  import broker
-from ..thread   import launch
-from ..workdir  import sync
+from ..client     import laps, spl
+from ..default    import Default
+from ..find       import find, fntime, last
+from ..object     import Object, fmt, update, values
+from ..repeater   import Repeater
+from ..runtime    import broker
+from ..thread     import launch
+from ..workdir    import sync
 
 
 def init():
@@ -51,12 +47,12 @@ TEMPLATE = """<opml version="1.0">
         <outline title="rssbot opml" text="24/7 feed fetcher">"""
 
 
-class Feed(Default):
+class Feed(Default): # pylint: disable=R0903
 
     "Feed"
 
 
-class Rss(Default):
+class Rss(Default): # pylint: disable=R0903
 
     "Rss"
 
@@ -66,7 +62,7 @@ class Rss(Default):
         self.rss          = ''
 
 
-class Seen(Default):
+class Seen(Default): # pylint: disable=R0903
 
     "Seen"
 
@@ -324,9 +320,6 @@ def useragent(txt):
     return 'Mozilla/5.0 (X11; Linux x86_64) ' + txt
 
 
-"commands"
-
-
 def dpl(event):
     "set display items."
     if len(event.args) < 2:
@@ -417,16 +410,3 @@ def rss(event):
     feed.rss = event.args[0]
     sync(feed)
     event.reply('ok')
-
-
-"register"
-
-
-Command.add(dpl)
-Command.add(exp)
-Command.add(nme)
-Command.add(rem)
-Command.add(res)
-Command.add(rss)
-whitelist(Rss)
-whitelist(Seen)

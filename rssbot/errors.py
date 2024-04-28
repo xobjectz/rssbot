@@ -1,21 +1,19 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105
 
 
-"errors"
+"deferred exception handling"
 
 
 import io
 import traceback
 
 
-class Errors:
+class Errors: # pylint: disable=R0903
 
     "Errors"
 
     errors = []
-
+    filter = []
 
     @staticmethod
     def out(txt):
@@ -23,17 +21,34 @@ class Errors:
 
 
 def debug(txt):
+    "print to console."
+    for skp in Errors.filter:
+        if skp in txt:
+            return
     Errors.out(txt)
 
 
 def enable(func):
+    "set output function."
     Errors.out = func
+
+
+def errors():
+    "show exceptions"
+    for exc in Errors.errors:
+        out(exc)
 
 
 def later(exc):
     "add an exception"
     excp = exc.with_traceback(exc.__traceback__)
     Errors.errors.append(excp)
+
+
+def out(exc):
+    "check if output function is set."
+    txt = str(tostr(exc))
+    Errors.out(txt)
 
 
 def tostr(exc):
@@ -51,13 +66,13 @@ def tostr(exc):
     return res
 
 
-def out(exc):
-    "check if output function is set."
-    txt = str(tostr(exc))
-    Errors.out(txt)
-
-
-def errors():
-    "show exceptions"
-    for exc in Errors.errors:
-        out(exc)
+def __dir__():
+    return (
+        'Errors',
+        'debug',
+        'enable',
+        'errors',
+        'later',
+        'tostr',
+        'out'
+    )

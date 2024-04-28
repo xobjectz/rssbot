@@ -1,6 +1,4 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105,W0212
 
 
 "handler"
@@ -31,7 +29,7 @@ class Handler:
         if not func:
             evt.ready()
             return
-        evt._thr = launch(func, self, evt)
+        evt._thr = launch(func, self, evt) # pylint: disable=W0212
 
     def loop(self):
         "proces events until interrupted."
@@ -61,3 +59,9 @@ class Handler:
     def stop(self):
         "stop the event loop."
         self.stopped.set()
+
+
+def __dir__():
+    return (
+        'Handler',
+    )

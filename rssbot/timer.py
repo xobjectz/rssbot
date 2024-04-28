@@ -1,6 +1,4 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105
 
 
 "timer"
@@ -15,7 +13,7 @@ from .thread import launch
 
 class Timer:
 
-    "run a function at a specific time."
+    "Timer"
 
     def __init__(self, sleep, func, *args, thrname=None):
         self.args  = args
@@ -47,3 +45,9 @@ class Timer:
         "stop timer."
         if self.timer:
             self.timer.cancel()
+
+
+def __dir__():
+    return (
+        'Timer',
+    )

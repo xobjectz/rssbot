@@ -1,9 +1,7 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105
 
 
-"objects"
+"clean namespace"
 
 
 import json
@@ -12,7 +10,7 @@ import pathlib
 import _thread
 
 
-disklock = _thread.allocate_lock()
+lock = _thread.allocate_lock()
 
 
 class Object:
@@ -117,7 +115,7 @@ def keys(obj):
 
 def read(obj, pth):
     "read an object from file path."
-    with disklock:
+    with lock:
         with open(pth, 'r', encoding='utf-8') as ofile:
             update(obj, load(ofile))
 
@@ -152,7 +150,7 @@ def values(obj):
 
 def write(obj, pth):
     "write an object to disk."
-    with disklock:
+    with lock:
         cdir(os.path.dirname(pth))
         with open(pth, 'w', encoding='utf-8') as ofile:
             dump(obj, ofile, indent=4)
@@ -252,9 +250,6 @@ def cdir(pth):
     os.makedirs(pth, exist_ok=True)
 
 
-"interface"
-
-
 def __dir__():
     return (
         'Object',
@@ -275,6 +270,3 @@ def __dir__():
         'values',
         'write'
     )
-
-
-__all__ = __dir__()

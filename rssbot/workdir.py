@@ -1,9 +1,7 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R
 
 
-"working directory"
+"workdir"
 
 
 import datetime
@@ -13,7 +11,7 @@ import os
 from .object import Object, cdir, fqn, read, write
 
 
-class Workdir(Object):
+class Workdir(Object): # pylint: disable=R0903
 
     "Workdir"
 
@@ -62,3 +60,16 @@ def sync(obj, pth=None):
     pth2 = store(pth)
     write(obj, pth2)
     return pth
+
+
+def __dir__():
+    return (
+        'Workdir',
+        'fetch',
+        'ident',
+        'liststore',
+        'skel',
+        'store',
+        'strip',
+        'sync'
+    )

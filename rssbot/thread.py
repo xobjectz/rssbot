@@ -1,6 +1,4 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105,W0718
 
 
 "thread"
@@ -32,8 +30,7 @@ class Thread(threading.Thread):
         return self
 
     def __next__(self):
-        for k in dir(self):
-            yield k
+        yield from dir(self)
 
     def join(self, timeout=1.0):
         "join this thread."
@@ -45,7 +42,7 @@ class Thread(threading.Thread):
         func, args = self.queue.get()
         try:
             self._result = func(*args)
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=W0718
             later(ex)
             if args and "Event" in str(type(args[0])):
                 args[0].ready()
@@ -73,3 +70,11 @@ def name(obj):
     if '__name__' in dir(obj):
         return f'{obj.__class__.__name__}.{obj.__name__}'
     return None
+
+
+def __dir__():
+    return (
+        'Thread',
+        'launch',
+        'name'
+    )

@@ -1,6 +1,4 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105,W0718
 
 
 "client"
@@ -57,7 +55,7 @@ def command(bot, evt):
     if func:
         try:
             func(evt)
-        except Exception as exc:
+        except Exception as exc: # pylint: disable=W0718
             later(exc)
     bot.show(evt)
     evt.ready()
@@ -164,3 +162,14 @@ def spl(txt):
     except (TypeError, ValueError):
         res = txt
     return [x for x in res if x]
+
+
+def __dir__():
+    return (
+        'Client',
+        'cmnd',
+        'command',
+        'lapse',
+        'parse_cmd',
+        'spl'
+    )
