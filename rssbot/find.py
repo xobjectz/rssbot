@@ -1,17 +1,15 @@
 # This file is placed in the Public Domain.
 
 
-"locate"
+"find"
 
 
 import os
 import time
 
 
-from .default   import Default
-from .object    import fqn, search, update
-from .whitelist import long
-from .workdir   import fetch, store, strip
+from .disk import fetch, long, store, strip
+from .object import Default, fqn, search, update
 
 
 def fns(mtc=""):

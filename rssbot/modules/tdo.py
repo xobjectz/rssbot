@@ -7,13 +7,13 @@
 import time
 
 
-from ..client    import laps
-from ..object    import Object
-from ..find      import fntime, find
-from ..workdir   import sync
+from ..client import laps
+from ..disk   import sync
+from ..find   import fntime, find
+from ..object import Object
 
 
-class NoDate(Exception): # pylint: disable=R0903
+class NoDate(Exception):
 
     "no matching date"
 

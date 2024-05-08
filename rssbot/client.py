@@ -4,11 +4,12 @@
 "client"
 
 
-from .command import Command
-from .default import Default
-from .errors  import later
-from .event   import Event
-from .handler import Handler
+import inspect
+
+
+from .handler import Event, Handler
+from .object  import Default, Object
+from .thread  import later
 
 
 class Client(Handler):
@@ -36,21 +37,21 @@ class Client(Handler):
             self.say(evt.channel, txt)
 
 
-def cmnd(txt, out):
-    "do a command using the provided output function."
-    clt = Client()
-    clt.raw = out
-    evn = Event()
-    evn.orig = object.__repr__(clt)
-    evn.txt = txt
-    command(clt, evn)
-    evn.wait()
-    return evn
+class Command(Object): # pylint: disable=R0903
+
+    "Command"
+
+    cmds = Object()
+
+
+def add(func):
+    "add command."
+    setattr(Command.cmds, func.__name__, func)
 
 
 def command(bot, evt):
     "check for and run a command."
-    parse_cmd(evt)
+    parse(evt)
     func = getattr(Command.cmds, evt.cmd, None)
     if func:
         try:
@@ -59,6 +60,18 @@ def command(bot, evt):
             later(exc)
     bot.show(evt)
     evt.ready()
+
+
+def cmnd(txt, outer):
+    "do a command using the provided output function."
+    clt = Client()
+    clt.raw = outer
+    evn = Event()
+    evn.orig = object.__repr__(clt)
+    evn.txt = txt
+    command(clt, evn)
+    evn.wait()
+    return evn
 
 
 def laps(seconds, short=True):
@@ -101,7 +114,7 @@ def laps(seconds, short=True):
     return txt
 
 
-def parse_cmd(obj, txt=None):
+def parse(obj, txt=None):
     "parse a string for a command."
     args = []
     obj.args    = obj.args or []
@@ -155,21 +168,22 @@ def parse_cmd(obj, txt=None):
         obj.txt = obj.cmd or ""
 
 
-def spl(txt):
-    "split comma separated string into a list."
-    try:
-        res = txt.split(',')
-    except (TypeError, ValueError):
-        res = txt
-    return [x for x in res if x]
+def scancmd(mod) -> None:
+    "scan module for commands."
+    for key, cmd in inspect.getmembers(mod, inspect.isfunction):
+        if key.startswith("cb"):
+            continue
+        if 'event' in cmd.__code__.co_varnames:
+            add(cmd)
 
 
 def __dir__():
     return (
         'Client',
-        'cmnd',
+        'Commands',
+        'add',
         'command',
-        'lapse',
-        'parse_cmd',
-        'spl'
+        'laps',
+        'parse',
+        'scancmd'
     )

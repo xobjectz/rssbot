@@ -1,25 +1,29 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
+#
+# pylint: disable=C0413
 
 
 "main"
 
 
 import os
-import pwd
+import readline
 import sys
+import termios
 import time
 
 
-from rssbot.client  import cmnd, parse_cmd, spl
-from rssbot.command import add
-from rssbot.default import Default
-from rssbot.errors  import enable, errors
-from rssbot.workdir import Workdir, skel
+sys.path.insert(0, os.getcwd())
 
 
-from rssbot.command   import scan as scancmd
-from rssbot.whitelist import scan as scancls
+from rssbot.client  import Client, cmnd, parse
+from rssbot.disk    import Workdir, skel
+from rssbot.handler import Event
+from rssbot.log     import debug, enable
+from rssbot.object  import Default
+from rssbot.run     import broker, init, scan
+from rssbot.thread  import errors, setout
 
 
 from rssbot import modules
@@ -27,10 +31,10 @@ from rssbot import modules
 
 Cfg             = Default()
 Cfg.dis         = ""
-Cfg.mod         = "cmd,irc,rss"
+Cfg.mod         = "cmd,irc,mod,rss"
 Cfg.opts        = ""
-Cfg.name        = "rssbot"
-Cfg.version     = "555"
+Cfg.name        = __file__.rsplit(os.sep, maxsplit=1)[-1]
+Cfg.version     = "11"
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
@@ -38,53 +42,77 @@ Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 Workdir.workdir = Cfg.wdr
 
 
-dte = time.ctime(time.time()).replace("  ", " ")
+class Console(Client):
+
+    "Console"
+
+    def __init__(self):
+        Client.__init__(self)
+        broker.add(self)
+
+    def announce(self, txt):
+        "disable announce."
+
+    def callback(self, evt):
+        "wait for callback."
+        Client.callback(self, evt)
+        evt.wait()
+
+    def poll(self):
+        "poll console and create event."
+        evt = Event()
+        evt.orig = object.__repr__(self)
+        evt.txt = input("> ")
+        evt.type = "command"
+        return evt
+
+    def say(self, _channel, txt):
+        "print to console"
+        txt = txt.encode('utf-8', 'replace').decode()
+        print(txt)
 
 
-def scan(pkg, modstr, disable=""):
-    "scan modules for commands and classes"
-    mds = []
-    for modname in spl(modstr):
-        if skip(modname, disable):
-            continue
-        module = getattr(pkg, modname, None)
-        if not module:
-            continue
-        scancmd(module)
-        scancls(module)
-    return mds
-
-
-def privileges(username):
-    "drop privileges."
-    pwnam = pwd.getpwnam(username)
-    os.setgid(pwnam.pw_gid)
-    os.setuid(pwnam.pw_uid)
-
-
-def skip(name, skipped):
-    "check for skipping"
-    for skp in spl(skipped):
-        if skp in name:
-            return True
-    return False
-
-
-def ver(event):
-    "show version."
-    event.reply(f"{Cfg.name.upper()} {Cfg.version}")
+def wrap(func):
+    "restore console."
+    old2 = None
+    try:
+        old2 = termios.tcgetattr(sys.stdin.fileno())
+    except termios.error:
+        pass
+    try:
+        func()
+    except (KeyboardInterrupt, EOFError):
+        print("")
+    finally:
+        if old2:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old2)
 
 
 def main():
     "main"
-    enable(print)
-    add(ver)
+    parse(Cfg, " ".join(sys.argv[1:]))
     skel()
-    parse_cmd(Cfg, " ".join(sys.argv[1:]))
-    scan(modules, Cfg.mod)
-    cmnd(Cfg.otxt, print)
+    enable(print)
+    setout(print)
+    if "a" in Cfg.opts:
+        Cfg.mod = ",".join(modules.__dir__())
+    if "v" in Cfg.opts:
+        dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
+        debug(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}')
+    if "h" in Cfg.opts:
+        print(__doc__)
+    scan(modules, Cfg.mod, Cfg.sets.dis)
+    if "c" in Cfg.opts:
+        init(modules, Cfg.mod, Cfg.sets.dis)
+        csl = Console()
+        csl.start()
+        while 1:
+            time.sleep(1.0)
+    elif Cfg.otxt:
+        cmnd(Cfg.otxt, print)
 
 
 if __name__ == "__main__":
-    main()
+    readline.redisplay()
+    wrap(main)
     errors()

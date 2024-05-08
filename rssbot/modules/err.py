@@ -4,7 +4,7 @@
 "deferred exception handling"
 
 
-from ..errors  import Errors, tostr
+from ..thread import Errors, formatexc
 
 
 def err(event):
@@ -12,6 +12,6 @@ def err(event):
     nmr = 0
     event.reply(f"status: {nmr} errors: {len(Errors.errors)}")
     for exc in Errors.errors:
-        txt = tostr(exc)
+        txt = formatexc(exc)
         for line in txt.split():
             event.reply(line)

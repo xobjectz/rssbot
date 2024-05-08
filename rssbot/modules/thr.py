@@ -8,7 +8,7 @@ import threading
 import time
 
 
-from ..client import laps
+from ..client    import laps
 from ..object import Object, update
 
 

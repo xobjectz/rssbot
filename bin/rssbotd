@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
+#
+# pylint: disable=C0413,W0212
 
 
 "daemon"
@@ -7,28 +9,27 @@
 
 import getpass
 import os
+import pathlib
 import pwd
 import sys
 import time
 
 
-from rssbot.client  import spl
-from rssbot.command import add
-from rssbot.default import Default
-from rssbot.errors  import enable, errors, later
-from rssbot.object  import cdir
-from rssbot.workdir import Workdir, skel
+from rssbot.disk   import Workdir, skel
+from rssbot.object import Default
+from rssbot.run    import init, scan
+from rssbot.thread import errors
 
 
-from rssbot.whitelist import scan as scancls
+from rssbot import modules
 
 
 Cfg             = Default()
-Cfg.mod         = "cmd,irc,rss"
-Cfg.opts        = ""
-Cfg.version     = "555"
+Cfg.dis         = ""
 Cfg.name        = "rssbot"
-Cfg.user        = getpass.getuser()
+Cfg.mod         = "cmd,irc,mod,rss"
+Cfg.version     = "556"
+Cfg.opts        = ""
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
@@ -36,95 +37,46 @@ Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 Workdir.workdir = Cfg.wdr
 
 
-from rssbot import modules # pylint: disable=C0413
-
-
-def daemon(ppidfile, verbose=False):
-    "run in the background."
-    # pylint: disable=W0212
+def daemon(pidfile, verbose=False):
+    "switch to background."
     pid = os.fork()
     if pid != 0:
         os._exit(0)
     os.setsid()
-    pid22 = os.fork()
-    if pid22 != 0:
+    pid2 = os.fork()
+    if pid2 != 0:
         os._exit(0)
     if not verbose:
-        with open('/dev/null', 'r', encoding="utf-8") as siss:
-            os.dup2(siss.fileno(), sys.stdin.fileno())
-        with open('/dev/null', 'a+', encoding="utf-8") as soss:
-            os.dup2(soss.fileno(), sys.stdout.fileno())
-        with open('/dev/null', 'a+', encoding="utf-8") as sess:
-            os.dup2(sess.fileno(), sys.stderr.fileno())
+        with open('/dev/null', 'r', encoding="utf-8") as sis:
+            os.dup2(sis.fileno(), sys.stdin.fileno())
+        with open('/dev/null', 'a+', encoding="utf-8") as sos:
+            os.dup2(sos.fileno(), sys.stdout.fileno())
+        with open('/dev/null', 'a+', encoding="utf-8") as ses:
+            os.dup2(ses.fileno(), sys.stderr.fileno())
     os.umask(0)
     os.chdir("/")
-    if os.path.exists(ppidfile):
-        os.unlink(ppidfile)
-    cdir(os.path.dirname(ppidfile))
-    with open(ppidfile, "w", encoding="utf-8") as fdss:
-        fdss.write(str(os.getpid()))
-
-
-def init(pkg, modstr, disable=""):
-    "start modules"
-    mds = []
-    for modname in spl(modstr):
-        if doskip(modname, disable):
-            continue
-        mod = getattr(pkg, modname, None)
-        if not mod:
-            continue
-        if "init" in dir(mod):
-            try:
-                mod.init()
-                mds.append(mod)
-            except Exception as ex: # pylint: disable=W0718
-                later(ex)
-    return mds
+    if os.path.exists(pidfile):
+        os.unlink(pidfile)
+    path = pathlib.Path(pidfile)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(pidfile, "w", encoding="utf-8") as fds:
+        fds.write(str(os.getpid()))
 
 
 def privileges(username):
-    "lower privileges."
+    "drop privileges."
     pwnam = pwd.getpwnam(username)
     os.setgid(pwnam.pw_gid)
     os.setuid(pwnam.pw_uid)
 
 
-def scan(pkg, modstr, disable=""):
-    "scan modules for commands and classes"
-    mds = []
-    for modname in spl(modstr):
-        if doskip(modname, disable):
-            continue
-        module = getattr(pkg, modname, None)
-        if not module:
-            continue
-        #scancmd(module)
-        scancls(module)
-    return mds
-
-
-def doskip(name, skipp):
-    "check for skipping"
-    for skp in spl(skipp):
-        if skp in name:
-            return True
-    return False
-
-
-def ver(event):
-    "show version."
-    event.reply(f"{Cfg.name.upper()} {Cfg.version}")
-
-
 def main():
     "main"
-    add(ver)
-    enable(print)
     skel()
-    scan(modules, Cfg.mod)
+    Cfg.user = getpass.getuser()
     daemon(Cfg.pidfile, "-v" in sys.argv)
     privileges(Cfg.user)
+    scan(modules, Cfg.mod)
     init(modules, Cfg.mod)
     while 1:
         time.sleep(1.0)
