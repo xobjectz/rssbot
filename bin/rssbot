@@ -34,7 +34,7 @@ Cfg.dis         = ""
 Cfg.mod         = "cmd,irc,mod,rss"
 Cfg.opts        = ""
 Cfg.name        = __file__.rsplit(os.sep, maxsplit=1)[-1]
-Cfg.version     = "11"
+Cfg.version     = "556"
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
