@@ -37,14 +37,6 @@ DEBUG = False
 fetchlock = _thread.allocate_lock()
 
 
-TEMPLATE = """<opml version="1.0">
-    <head>
-        <title>rssbot opml</title>
-    </head>
-    <body>
-        <outline title="rssbot opml" text="24/7 feed fetcher">"""
-
-
 class Feed(Default): # pylint: disable=R0903
 
     "Feed"
@@ -270,6 +262,7 @@ def getfeed(url, items):
             result = Parser.parse(str(rest.data, 'utf-8'), 'item', items) or []
     return result
 
+
 def gettinyurl(url):
     "fetch a tinyurl."
     postarray = [
@@ -329,20 +322,6 @@ def dpl(event):
             update(feed, setter)
             sync(feed)
     event.reply('ok')
-
-
-def exp(event):
-    "export to opml."
-    event.reply(TEMPLATE)
-    nrs = 0
-    for _fn, obj in find("rss"):
-        nrs += 1
-        name = obj.name or f"url{nrs}"
-        txt = f'<outline name={name} display_list={obj.display_list} xmlUrl="{obj.rss}"/>'
-        event.reply(" "*12 + txt)
-    event.reply(" "*8 + "</outline>")
-    event.reply("    <body>")
-    event.reply("</opml>")
 
 
 def nme(event):
