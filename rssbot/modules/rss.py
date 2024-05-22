@@ -155,7 +155,7 @@ class Parser:
         index1 += len(attr) + 2
         index2 = line.find('"', index1)
         if index2 == -1:
-            index2 = line.find('"/>', index1)
+            index2 = line.find('/>', index1)
         if index2 == -1:
             return lne
         lne = line[index1:index2]
@@ -236,6 +236,7 @@ class Parser:
                         continue
                     if itm == "link":
                         itm = "href"
+                    print(att, itm)
                     val = Parser.getvalue(att, itm)
                     if not val:
                         continue

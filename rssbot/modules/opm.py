@@ -46,11 +46,13 @@ def imp(event):
     prs = Parser()
     nrs = 0
     for o in prs.parse(txt, 'outline', "name,display_list,xmlUrl"):
+        print(o)
         nrs += 1
-        if o.xmlUrl and find("rss", o):
-            event.reply(f"skipping %{nrs} url is already there.")
+        if o.xmlUrl and find("rss", {"rss": o.xmlUrl}):
+            event.reply(f"skipping {o.xmlUrl}")
             continue
         rss = Rss()
         construct(rss, o)
+        rss.rss = rss.xmlUrl
         sync(rss)
         event.reply(o)
