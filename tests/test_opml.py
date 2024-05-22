@@ -19,6 +19,12 @@ class TestOPML(unittest.TestCase):
         res = p.parse(TXT, "outline", "title,type,text,xmlUrl")
         self.assertTrue(len(res) == 4)
 
+    def test_import(self):
+        p = Parser()
+        res = p.parse(TXT2, "outline", "name,display_list,xmlUrl")
+        for ooo in res:
+            print(ooo)
+        self.assertTrue(len(res) == 3)
 
 TXT = """<opml version="1.0">
     <head>
@@ -58,3 +64,16 @@ TXT = """<opml version="1.0">
         </outline>
     </body>
 </opml>"""
+
+TXT2 = """
+<opml version="1.0">
+    <head>
+        <title>rssbot opml</title>
+    </head>
+    <body>
+        <outline title="rssbot opml" text="24/7 feed fetcher">
+            <outline name="url1" display_list="title,link,author" xmlUrl="http://hnrss.org/newest"/>
+        </outline>
+    </body>
+</opml>
+"""
