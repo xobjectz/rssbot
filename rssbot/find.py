@@ -44,6 +44,7 @@ def find(mtc, selector=None, index=None, deleted=False):
     "find object matching the selector dict."
     clz = long(mtc)
     nrs = -1
+    result = []
     for fnm in sorted(fns(clz), key=fntime):
         obj = Default()
         fetch(obj, fnm)
@@ -54,7 +55,8 @@ def find(mtc, selector=None, index=None, deleted=False):
         nrs += 1
         if index is not None and nrs != int(index):
             continue
-        yield (fnm, obj)
+        result.append((fnm, obj))
+    return result
 
 
 def last(obj, selector=None):

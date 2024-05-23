@@ -47,7 +47,6 @@ def imp(event):
     prs = OPMLParser()
     nrs = 0
     for o in prs.parse(txt, 'outline', "name,display_list,xmlUrl"):
-        print(o)
         nrs += 1
         if o.xmlUrl and find("rss", {"rss": o.xmlUrl}):
             event.reply(f"skipping {o.xmlUrl}")
