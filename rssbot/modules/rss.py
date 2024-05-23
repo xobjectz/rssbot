@@ -21,7 +21,7 @@ from ..disk   import sync
 from ..find   import find, fntime, last
 from ..object import Default, Object, fmt, update, values
 from ..parser import Parser
-from ..run    import broker, spl
+from ..run    import broker
 from ..thread import Repeater, launch
 
 

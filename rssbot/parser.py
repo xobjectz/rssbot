@@ -73,6 +73,8 @@ class Parser:
 
 class OPMLParser:
 
+    "OPMLParser"
+
     @staticmethod
     def getvalue(line, attr):
         "retrieve attribute value."
@@ -113,6 +115,7 @@ class OPMLParser:
 
     @staticmethod
     def parse(txt, toke="outline", items="xmlUrl"):
+        "parse on outlines."
         result = []
         for attrs in OPMLParser.getattrs(txt, toke):
             if not attrs:
