@@ -10,18 +10,8 @@
 import unittest
 
 
-from rssbot.parser import OPMLParser
+from rssbot.modules.opm import Parser
 
-
-class TestOPML(unittest.TestCase):
-
-    def test_opml(self):
-        res = OPMLParser.parse(TXT, "outline", "title,type,text,xmlUrl")
-        self.assertTrue(len(res) == 20)
-
-    def test_import(self):
-        res = OPMLParser.parse(TXT2, "outline", "name,display_list,xmlUrl")
-        self.assertTrue(len(res) == 1)
 
 TXT = """<opml version="1.0">
     <head>
@@ -62,6 +52,7 @@ TXT = """<opml version="1.0">
     </body>
 </opml>"""
 
+
 TXT2 = """
 <opml version="1.0">
     <head>
@@ -74,3 +65,14 @@ TXT2 = """
     </body>
 </opml>
 """
+
+
+class TestOPML(unittest.TestCase):
+
+    def test_opml(self):
+        res = Parser.parse(TXT, "outline", "title,type,text,xmlUrl")
+        self.assertTrue(len(res) == 20)
+
+    def test_import(self):
+        res = Parser.parse(TXT2, "outline", "name,display_list,xmlUrl")
+        self.assertTrue(len(res) == 1)
