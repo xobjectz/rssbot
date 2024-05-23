@@ -75,6 +75,13 @@ rss
     $ rssbot rem <url>
     $ rssbot nme <url> <name>
 
+opml
+
+::
+
+    $ rssbot exp
+    $ rssbot imp <filename>
+
 
 SYSTEMD
 
