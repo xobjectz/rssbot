@@ -7,9 +7,10 @@
 from ..disk   import sync
 from ..find   import find
 from ..object import construct
+from ..parser import OPMLParser
 
 
-from .rss import Rss, Parser
+from .rss import Rss
 
 
 TEMPLATE = """<opml version="1.0">
@@ -43,7 +44,7 @@ def imp(event):
     fnm = event.args[0]
     with open(fnm, "r") as file:
         txt = file.read()
-    prs = Parser()
+    prs = OPMLParser()
     nrs = 0
     for o in prs.parse(txt, 'outline', "name,display_list,xmlUrl"):
         print(o)
