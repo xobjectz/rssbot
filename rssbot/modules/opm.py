@@ -121,4 +121,5 @@ def imp(event):
         rss.rss = rss.xmlUrl
         rss.id = shortid()
         sync(rss)
-        event.reply(obj)
+    if nrs:
+        event.reply(f"added {nrs} urls.")
