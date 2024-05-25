@@ -4,6 +4,14 @@
 "utilities"
 
 
+import uuid
+
+
+def shortid():
+    "create short id."
+    return str(uuid.uuid4())[:8]
+
+
 def skip(name, skipp):
     "check for skipping"
     for skp in spl(skipp):
@@ -23,6 +31,7 @@ def spl(txt):
 
 def __dir__():
     return (
+        'shortid',
         'skip',
         'spl'
     )

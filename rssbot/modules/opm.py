@@ -4,10 +4,13 @@
 "outline processor markup language"
 
 
+import uuid
+
+
 from ..disk   import sync
 from ..find   import find
 from ..object import Default, construct
-from ..run    import spl
+from ..utils  import shortid, spl
 
 
 from .rss import Rss
@@ -116,5 +119,6 @@ def imp(event):
         rss = Rss()
         construct(rss, obj)
         rss.rss = rss.xmlUrl
+        rss.id = shortid()
         sync(rss)
         event.reply(obj)
