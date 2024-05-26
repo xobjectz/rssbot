@@ -27,8 +27,8 @@ from rssbot import modules
 Cfg             = Default()
 Cfg.dis         = ""
 Cfg.name        = "rssbot"
-Cfg.mod         = "cmd,irc,mod,rss"
-Cfg.version     = "556"
+Cfg.mod         = "irc,rss"
+Cfg.version     = "557"
 Cfg.opts        = ""
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")

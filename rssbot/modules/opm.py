@@ -111,6 +111,7 @@ def imp(event):
         txt = file.read()
     prs = Parser()
     nrs = 0
+    id = shortid()
     for obj in prs.parse(txt, 'outline', "name,display_list,xmlUrl"):
         nrs += 1
         if obj.xmlUrl and find("rss", {"rss": obj.xmlUrl}):
@@ -119,7 +120,7 @@ def imp(event):
         rss = Rss()
         construct(rss, obj)
         rss.rss = rss.xmlUrl
-        rss.id = shortid()
+        rss.id = id
         sync(rss)
     if nrs:
         event.reply(f"added {nrs} urls.")
