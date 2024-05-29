@@ -101,7 +101,7 @@ replace "<user>" with the user running pipx
     Group=<user>
     WorkingDirectory=/home/<user>/.rssbot
     ExecStart=/home/<user>/.local/pipx/venvs/rssbot/bin/rssbotd
-    KillSignal=SIGKILL
+    WatchdogSec=1
     RemainAfterExit=yes
 
     [Install]
