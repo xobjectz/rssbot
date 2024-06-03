@@ -17,7 +17,7 @@ import time
 from rssbot.disk   import Workdir, skel
 from rssbot.object import Default, cdir
 from rssbot.run    import init, scan
-from rssbot.thread import errors
+from rssbot.thread import errors, later
 
 
 from rssbot import modules
@@ -76,9 +76,13 @@ def wrap(func):
     "restore console."
     try:
         func()
+    except (KeyboardInterrupt, EOFError):
+        if "-d" not in sys.argv:
+            print("")
     except Exception as ex:
-        if "v" in Cfg.opts:
-            errors()
+        later(ex)
+    if "v" in Cfg.opts:
+        errors()
 
 
 def main():

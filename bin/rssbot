@@ -28,7 +28,7 @@ from rssbot import modules
 
 Cfg             = Default()
 Cfg.dis         = ""
-Cfg.mod         = "cmd,irc,mod,opm,rss"
+Cfg.mod         = "cmd,irc,opm,rss"
 Cfg.opts        = ""
 Cfg.name        = __file__.rsplit(os.sep, maxsplit=1)[-1]
 Cfg.version     = "558"
