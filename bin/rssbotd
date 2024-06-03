@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C0413,W0212
+# pylint: disable=C0413,W0212,W0718,W0612
 
 
 "daemon"
@@ -9,7 +9,6 @@
 
 import getpass
 import os
-import pathlib
 import pwd
 import sys
 import time
