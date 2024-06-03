@@ -10,7 +10,7 @@
 import unittest
 
 
-from rssbot.attrs import Parser
+from rssbot.modules.opm import Parser
 
 
 class TestAttrs(unittest.TestCase):
