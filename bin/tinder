@@ -66,6 +66,7 @@ param.cfg = [
     "commands=true",
     ""]
 param.cmd = [""]
+param.fnd = ["fnd rss", "fnd seen", ""]
 param.dpl = ["hnrss title,summary,link"]
 param.mre = ["2"]
 param.nme = ["hnrss hackernews"]
@@ -171,7 +172,7 @@ if __name__ == "__main__":
             shutil.rmtree(Workdir.workdir)
     if Cfg.wdr:
         Workdir.workdir = Cfg.wdr
-    Cfg.mod = lsmod(path)
+    Cfg.mod = ",".join(modules.__dir__())
     enable(print)
     dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
     debug(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
