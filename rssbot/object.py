@@ -251,6 +251,7 @@ def dumps(*args, **kw):
 
 
 def cdir(pth):
+    "create directory."
     path = pathlib.Path(pth)
     path.parent.mkdir(parents=True, exist_ok=True)
 

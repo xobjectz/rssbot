@@ -28,7 +28,7 @@ Cfg             = Default()
 Cfg.dis         = ""
 Cfg.name        = "rssbot"
 Cfg.mod         = "irc,rss"
-Cfg.version     = "557"
+Cfg.version     = "558"
 Cfg.opts        = ""
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
@@ -58,6 +58,7 @@ def daemon(verbose=False):
 
 
 def pidfile(path):
+    "create pidfile"
     if os.path.exists(path):
         os.unlink(path)
     cdir(path)
@@ -72,6 +73,15 @@ def privileges(username):
     os.setuid(pwnam.pw_uid)
 
 
+def wrap(func):
+    "restore console."
+    try:
+        func()
+    except Exception as ex:
+        if "v" in Cfg.opts:
+            errors()
+
+
 def main():
     "main"
     skel()
@@ -83,10 +93,8 @@ def main():
     scan(modules, Cfg.mod)
     init(modules, Cfg.mod)
     while 1:
-        try:
-            time.sleep(1.0)
-        except:
-            errors() 
+        time.sleep(1.0)
+
 
 if __name__ == "__main__":
-    main()
+    wrap(main)

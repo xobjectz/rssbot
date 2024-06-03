@@ -8,7 +8,7 @@ from .broker  import Broker
 from .client  import scancmd
 from .disk    import scancls
 from .thread  import later
-
+from .utils   import skip, spl
 
 broker = Broker()
 
@@ -45,28 +45,9 @@ def scan(pkg, modstr, disable=""):
     return mds
 
 
-def skip(name, skipp):
-    "check for skipping"
-    for skp in spl(skipp):
-        if skp in name:
-            return True
-    return False
-
-
-def spl(txt):
-    "split comma separated string into a list."
-    try:
-        res = txt.split(',')
-    except (TypeError, ValueError):
-        res = txt
-    return [x for x in res if x]
-
-
 def __dir__():
     return (
         'broker',
         'init',
-        'scan',
-        'skip',
-        'spl'
+        'scan'
     )
