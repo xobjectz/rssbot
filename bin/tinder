@@ -9,6 +9,7 @@
 
 import os
 import profile
+import shutil
 import sys
 import termios
 import time
@@ -46,7 +47,7 @@ Cfg.mod         = ""
 Cfg.name        = "tinder"
 Cfg.silent      = False
 Cfg.skip        = ["debug",]
-Cfg.version     = "556"
+Cfg.version     = "19"
 Cfg.wdr         = ".test"
 
 
@@ -141,7 +142,8 @@ def wrap(func):
     finally:
         if old2:
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old2)
-
+    errors()
+    
 
 def main():
     "main"
@@ -164,6 +166,9 @@ def main():
 
 if __name__ == "__main__":
     parse(Cfg, " ".join(sys.argv[1:]))
+    if "f" in Cfg.opts:
+        if os.path.exists(Workdir.workdir):
+            shutil.rmtree(Workdir.workdir)
     Cfg.mod = lsmod(path)
     enable(print)
     dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
@@ -172,4 +177,4 @@ if __name__ == "__main__":
         profile.runctx(main.__code__, globals(), locals())
     else:
         wrap(main)
-    errors()
+    sys.exit()

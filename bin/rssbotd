@@ -16,7 +16,7 @@ import time
 
 
 from rssbot.disk   import Workdir, skel
-from rssbot.object import Default
+from rssbot.object import Default, cdir
 from rssbot.run    import init, scan
 from rssbot.thread import errors
 
@@ -37,7 +37,7 @@ Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 Workdir.workdir = Cfg.wdr
 
 
-def daemon(pidfile, verbose=False):
+def daemon(verbose=False):
     "switch to background."
     pid = os.fork()
     if pid != 0:
@@ -55,11 +55,13 @@ def daemon(pidfile, verbose=False):
             os.dup2(ses.fileno(), sys.stderr.fileno())
     os.umask(0)
     os.chdir("/")
-    if os.path.exists(pidfile):
-        os.unlink(pidfile)
-    path = pathlib.Path(pidfile)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(pidfile, "w", encoding="utf-8") as fds:
+
+
+def pidfile(path):
+    if os.path.exists(path):
+        os.unlink(path)
+    cdir(path)
+    with open(path, "w", encoding="utf-8") as fds:
         fds.write(str(os.getpid()))
 
 
@@ -74,14 +76,17 @@ def main():
     "main"
     skel()
     Cfg.user = getpass.getuser()
-    daemon(Cfg.pidfile, "-v" in sys.argv)
+    if "-d" in sys.argv:
+        daemon("-v" in sys.argv)
+    pidfile(Cfg.pidfile)
     privileges(Cfg.user)
     scan(modules, Cfg.mod)
     init(modules, Cfg.mod)
     while 1:
-        time.sleep(1.0)
-
+        try:
+            time.sleep(1.0)
+        except:
+            errors() 
 
 if __name__ == "__main__":
     main()
-    errors()

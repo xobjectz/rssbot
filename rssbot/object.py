@@ -250,6 +250,11 @@ def dumps(*args, **kw):
     return json.dumps(*args, **kw)
 
 
+def cdir(pth):
+    path = pathlib.Path(pth)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+
 def __dir__():
     return (
         'Object',
