@@ -8,9 +8,13 @@ import datetime
 import inspect
 import os
 import pathlib
+import _thread
 
 
 from .object import Object, fqn, read, write
+
+
+disklock = _thread.allocate_lock()
 
 
 class Workdir(Object): # pylint: disable=R0903
@@ -22,9 +26,10 @@ class Workdir(Object): # pylint: disable=R0903
 
 def fetch(obj, pth):
     "read object from disk."
-    pth2 = store(pth)
-    read(obj, pth2)
-    return strip(pth)
+    with disklock:
+        pth2 = store(pth)
+        read(obj, pth2)
+        return strip(pth)
 
 
 def ident(obj):
@@ -59,11 +64,12 @@ def strip(pth, nmr=3):
 
 def sync(obj, pth=None):
     "sync object to disk."
-    if pth is None:
-        pth = ident(obj)
-    pth2 = store(pth)
-    write(obj, pth2)
-    return pth
+    with disklock:
+        if pth is None:
+            pth = ident(obj)
+        pth2 = store(pth)
+        write(obj, pth2)
+        return pth
 
 
 class Whitelist(Object): # pylint: disable=R0903

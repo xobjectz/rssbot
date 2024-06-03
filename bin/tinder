@@ -169,6 +169,8 @@ if __name__ == "__main__":
     if "f" in Cfg.opts:
         if os.path.exists(Workdir.workdir):
             shutil.rmtree(Workdir.workdir)
+    if Cfg.wdr:
+        Workdir.workdir = Cfg.wdr
     Cfg.mod = lsmod(path)
     enable(print)
     dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])

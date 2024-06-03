@@ -14,6 +14,9 @@ import termios
 import time
 
 
+sys.path.insert(0, os.getcwd())
+
+
 from rssbot.client  import Client, cmnd, parse
 from rssbot.disk    import Workdir, skel
 from rssbot.handler import Event
