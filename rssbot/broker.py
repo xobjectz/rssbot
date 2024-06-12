@@ -82,7 +82,7 @@ class Broker:
         "return all matching keys."
         if Broker.persist:
             return fns(key)
-        return [x for x in keys(self.objs) if key == x.split(os.sep)[0]]
+        return [x for x in keys(self.objs) if key == x.split(os.sep, maxsplit=1)[0]]
 
     def last(self, obj):
         "return last object saved."
