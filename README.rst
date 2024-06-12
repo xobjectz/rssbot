@@ -1,12 +1,11 @@
 NAME
 
- RSSBOT - 24/7 feed Fetcher
-
+    RSSBOT - 24/7 feed Fetcher
 
 INSTALL
 
- $ pipx install rssbot
- $ pipx ensurepath
+    $ pipx install rssbot
+    $ pipx ensurepath
 
 
 SYNOPSIS
@@ -37,18 +36,18 @@ COMMANDS
 
 CONFIGURATION
 
-irc
+    irc
 
     $ rssbot cfg server=<server>
     $ rssbot cfg channel=<channel>
     $ rssbot cfg nick=<nick>
 
-sasl
-
+    sasl
+ 
     $ rssbot pwd <nsvnick> <nspass>
     $ rssbot cfg password=<frompwd>
 
-rss
+    rss
 
     $ rssbot rss <url>
     $ rssbot dpl <url> <item1,item2>
@@ -63,10 +62,9 @@ opml
 
 SYSTEMD
 
-save the following it in /etc/systemd/system/rssbot.service and
-replace "<user>" with the user running pipx
+    save the following it in /etc/systemd/system/rssbot.service and
+    replace "<user>" with the user running pipx::
 
-::
 
     [Unit]
     Description=24/7 feed fetcher
@@ -86,12 +84,12 @@ replace "<user>" with the user running pipx
     WantedBy=default.target
 
 
-then run this
+    then run this
 
     $ mkdir ~/.rssbot
     $ sudo systemctl enable rssbot --now
 
-default channel/server is #rssbot on localhost
+    default channel/server is #rssbot on localhost
 
 
 FILES
