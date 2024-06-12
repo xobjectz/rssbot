@@ -47,6 +47,7 @@ COMMANDS
 CONFIGURATION
 
 ::
+
     irc
 
     $ rssbot cfg server=<server>
@@ -74,7 +75,6 @@ opml
 
 
 SYSTEMD
-
 
 ::
 
