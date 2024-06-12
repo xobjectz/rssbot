@@ -38,10 +38,14 @@ COMMANDS
     cfg - irc configuration
     cmd - commands
     dpl - sets display items
+    exp - export opml (stdout)
+    imp - import opml
     mre - displays cached output
     pwd - sasl nickserv name/pass
     rem - removes a rss feed
+    res - restore deleted objects
     rss - add a feed
+    syn - sync rss feeds
 
 
 CONFIGURATION
@@ -66,9 +70,7 @@ CONFIGURATION
     $ rssbot rem <url>
     $ rssbot nme <url> <name>
 
-opml
-
-::
+    opml
 
     $ rssbot exp
     $ rssbot imp <filename>
