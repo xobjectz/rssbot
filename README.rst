@@ -1,14 +1,12 @@
 NAME
-====
 
-    RSSBOT - 24/7 feed Fetcher
+|    RSSBOT - 24/7 feed Fetcher
 
 
 INSTALL
-=======
 
-    $ pipx install rssbot
-    $ pipx ensurepath
+    | $ pipx install rssbot
+    | $ pipx ensurepath
 
 
 SYNOPSIS
