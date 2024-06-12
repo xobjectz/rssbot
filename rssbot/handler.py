@@ -9,11 +9,8 @@ import threading
 import _thread
 
 
-from .object import Default, Object
-from .thread import launch
-
-
-rpr = object.__repr__
+from .object  import Object
+from .thread  import launch
 
 
 class Handler:
@@ -64,38 +61,7 @@ class Handler:
         self.stopped.set()
 
 
-class Event(Default): # pylint: disable=R0902
-
-    "Event"
-
-    def __init__(self):
-        Default.__init__(self)
-        self._thr    = None
-        self._ready  = threading.Event()
-        self.done    = False
-        self.orig    = None
-        self.result  = []
-        self.txt     = ""
-        self.type    = "event"
-
-    def ready(self):
-        "event is ready."
-        self._ready.set()
-
-    def reply(self, txt):
-        "add text to the result"
-        self.result.append(txt)
-
-    def wait(self):
-        "wait for event to be ready."
-        if self._thr:
-            self._thr.join()
-        self._ready.wait()
-        return self.result
-
-
 def __dir__():
     return (
-        'Event',
-        'Handler'
+        'Handler',
     )

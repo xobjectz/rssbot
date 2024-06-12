@@ -1,26 +1,48 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C0413,W0611
+# pylint: disable=C0413,W0212,W0611
 
 
-"main"
+"""RSSBOT
+
+    rssbot  <cmd> [key=val] [key==val]
+    rssbot  [-a] [-c] [-h] [-v]
+    rssbotd
+
+    options are:
+
+    -a     load all modules
+    -c     start console
+    -h     show help
+    -v     use verbose
+
+    the cmd command show available commands.
+    
+    $ rssbot cmd
+    cfg,cmd,dpl,err,exp,imp,mod,mre,nme,pwd,rem,res,rss,thr
+
+"""
 
 
+import getpass
 import os
+import pathlib
+import pwd
 import readline
 import sys
 import termios
 import time
 
 
-from rssbot.client  import Client, cmnd, parse
-from rssbot.disk    import Workdir, skel
-from rssbot.handler import Event
-from rssbot.log     import debug, enable
-from rssbot.object  import Default
-from rssbot.run     import broker, init, scan
-from rssbot.thread  import errors, setout
+from rssbot.client  import Client, cmnd, init, scan
+from rssbot.default import Default
+from rssbot.disk    import Workdir
+from rssbot.errors  import Errors, errors
+from rssbot.event   import Event
+from rssbot.log     import Logging, debug
+from rssbot.parser  import parse
+from rssbot.run     import broker
 
 
 from rssbot import modules
@@ -28,10 +50,10 @@ from rssbot import modules
 
 Cfg             = Default()
 Cfg.dis         = ""
-Cfg.mod         = "cmd,irc,opm,rss"
+Cfg.mod         = "cmd,irc,rss"
+Cfg.name        = "rssbot"
 Cfg.opts        = ""
-Cfg.name        = __file__.rsplit(os.sep, maxsplit=1)[-1]
-Cfg.version     = "558"
+Cfg.version     = "560"
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
@@ -83,14 +105,15 @@ def wrap(func):
     finally:
         if old2:
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old2)
+    errors()
 
 
 def main():
     "main"
     parse(Cfg, " ".join(sys.argv[1:]))
-    skel()
-    enable(print)
-    setout(print)
+    Workdir.skel()
+    if "v" in Cfg.opts and "d" not in Cfg.opts:
+        Errors.out = Logging.out = print
     if "a" in Cfg.opts:
         Cfg.mod = ",".join(modules.__dir__())
     if "v" in Cfg.opts:
@@ -111,4 +134,3 @@ def main():
 
 if __name__ == "__main__":
     wrap(main)
-    errors()

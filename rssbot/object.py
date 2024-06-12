@@ -4,6 +4,7 @@
 "clean namespace"
 
 
+import datetime
 import json
 import pathlib
 import _thread
@@ -27,14 +28,6 @@ class Object: # pylint: disable=R0902
 
     def __str__(self):
         return str(self.__dict__)
-
-
-class Default(Object): # pylint: disable=R0902,R0903
-
-    "Default"
-
-    def __getattr__(self, key):
-        return self.__dict__.get(key, "")
 
 
 def construct(obj, *args, **kwargs):
@@ -102,8 +95,13 @@ def fqn(obj):
     "return full qualified name of an object."
     kin = str(type(obj)).split()[-1][1:-2]
     if kin == "type":
-        kin = obj.__name__
+        kin = f"{obj.__module__}.{obj.__name__}"
     return kin
+
+
+def ident(obj):
+    "return an id for an object."
+    return pjoin(fqn(obj), *str(datetime.datetime.now()).split())
 
 
 def items(obj):
@@ -120,6 +118,14 @@ def keys(obj):
     return list(obj.__dict__.keys())
 
 
+def match(obj, txt):
+    "check if object matches provided values."
+    for key in keys(obj):
+        if txt in key:
+            return True
+    return False
+
+
 def read(obj, pth):
     "read an object from file path."
     with lock:
@@ -131,9 +137,11 @@ def search(obj, selector):
     "check if object matches provided values."
     res = False
     if not selector:
-        return True
+        return res
     for key, value in items(selector):
         val = getattr(obj, key, None)
+        if not val:
+            continue
         if str(value).lower() in str(val).lower():
             res = True
         else:
@@ -158,8 +166,7 @@ def values(obj):
 def write(obj, pth):
     "write an object to disk."
     with lock:
-        path = pathlib.Path(pth)
-        path.parent.mkdir(parents=True, exist_ok=True)
+        cdir(pth)
         with open(pth, 'w', encoding='utf-8') as ofile:
             dump(obj, ofile, indent=4)
 
@@ -214,7 +221,7 @@ class ObjectEncoder(json.JSONEncoder):
     def __init__(self, *args, **kwargs):
         json.JSONEncoder.__init__(self, *args, **kwargs)
 
-    def default(self, o):
+    def default(self, o): # pylint: disable=R0911
         "return stringable value."
         if isinstance(o, dict):
             return o.items()
@@ -227,7 +234,10 @@ class ObjectEncoder(json.JSONEncoder):
         try:
             return json.JSONEncoder.default(self, o)
         except TypeError:
-            return o.__dict__
+            try:
+                return o.__dict__
+            except AttributeError:
+                return repr(o)
 
     def encode(self, o) -> str:
         "encode object to string."
@@ -256,24 +266,29 @@ def cdir(pth):
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
+def pjoin(*args):
+    "path join."
+    return "/".join(args)
+
+
 def __dir__():
     return (
         'Object',
-        'Default',
         'construct',
         'dump',
-        'dumps',
         'edit',
         'fmt',
         'fqn',
+        'dumps',
         'hook',
-        'items',
+        'ident',
         'keys',
         'load',
+        'items',
         'loads',
-        'read',
         'search',
         'update',
+        'read',
         'values',
         'write'
     )

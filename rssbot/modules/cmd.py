@@ -5,9 +5,9 @@
 
 
 
-from ..client import Command
+from ..commands import Commands
 
 
 def cmd(event):
     "list commands."
-    event.reply(",".join(sorted(list(Command.cmds))))
+    event.reply(",".join(sorted(list(Commands.cmds))))

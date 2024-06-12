@@ -16,11 +16,13 @@ import _thread
 
 
 from ..client  import Client, command
-from ..disk    import sync, whitelist
+from ..classes import Classes
+from ..default import Default
+from ..disk    import sync
+from ..event   import Event
 from ..find    import last
-from ..handler import Event
 from ..log     import Logging, debug
-from ..object  import Default, Object, edit, fmt, keys, values
+from ..object  import Object, edit, fmt, keys, values
 from ..run     import broker
 from ..thread  import later, launch
 
@@ -57,7 +59,7 @@ class Config(Default): # pylint: disable=R0902,R0903
     "Config"
 
     channel = f'#{NAME}'
-    commands = False
+    commands = True
     control = '!'
     edited = time.time()
     nick = NAME
@@ -82,7 +84,7 @@ class Config(Default): # pylint: disable=R0902,R0903
         self.username = self.username or Config.username
 
 
-whitelist(Config)
+Classes.whitelist(Config)
 
 
 class TextWrap(textwrap.TextWrapper):

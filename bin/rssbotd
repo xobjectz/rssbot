@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C0413,W0212,W0718,W0612
 
 
 "daemon"
@@ -9,15 +7,15 @@
 
 import getpass
 import os
+import pathlib
 import pwd
 import sys
 import time
 
 
-from rssbot.disk   import Workdir, skel
-from rssbot.object import Default, cdir
-from rssbot.run    import init, scan
-from rssbot.thread import errors, later
+from rssbot.client  import init, scan
+from rssbot.default import Default
+from rssbot.disk    import Workdir
 
 
 from rssbot import modules
@@ -25,10 +23,10 @@ from rssbot import modules
 
 Cfg             = Default()
 Cfg.dis         = ""
-Cfg.name        = "rssbot"
-Cfg.mod         = "irc,rss"
-Cfg.version     = "558"
+Cfg.mod         = "cmd,irc,rss"
 Cfg.opts        = ""
+Cfg.name        = "rssbot"
+Cfg.version     = "560"
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
@@ -36,15 +34,15 @@ Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 Workdir.workdir = Cfg.wdr
 
 
-def daemon(verbose=False):
+def daemon(pidfile, verbose=False):
     "switch to background."
     pid = os.fork()
     if pid != 0:
-        os._exit(0)
+        os._exit(0) # pylint: disable=W0212
     os.setsid()
     pid2 = os.fork()
     if pid2 != 0:
-        os._exit(0)
+        os._exit(0) # pylint: disable=W0212
     if not verbose:
         with open('/dev/null', 'r', encoding="utf-8") as sis:
             os.dup2(sis.fileno(), sys.stdin.fileno())
@@ -54,14 +52,11 @@ def daemon(verbose=False):
             os.dup2(ses.fileno(), sys.stderr.fileno())
     os.umask(0)
     os.chdir("/")
-
-
-def pidfile(path):
-    "create pidfile"
-    if os.path.exists(path):
-        os.unlink(path)
-    cdir(path)
-    with open(path, "w", encoding="utf-8") as fds:
+    if os.path.exists(pidfile):
+        os.unlink(pidfile)
+    path = pathlib.Path(pidfile)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(pidfile, "w", encoding="utf-8") as fds:
         fds.write(str(os.getpid()))
 
 
@@ -72,26 +67,12 @@ def privileges(username):
     os.setuid(pwnam.pw_uid)
 
 
-def wrap(func):
-    "restore console."
-    try:
-        func()
-    except (KeyboardInterrupt, EOFError):
-        if "-d" not in sys.argv:
-            print("")
-    except Exception as ex:
-        later(ex)
-    if "v" in Cfg.opts:
-        errors()
-
-
 def main():
     "main"
-    skel()
+    Workdir.skel()
     Cfg.user = getpass.getuser()
-    if "-d" in sys.argv:
-        daemon("-v" in sys.argv)
-    pidfile(Cfg.pidfile)
+    Cfg.mod  = ",".join(dir(modules))
+    daemon(Cfg.pidfile, "-v" in sys.argv)
     privileges(Cfg.user)
     scan(modules, Cfg.mod)
     init(modules, Cfg.mod)
@@ -99,5 +80,4 @@ def main():
         time.sleep(1.0)
 
 
-if __name__ == "__main__":
-    wrap(main)
+main()

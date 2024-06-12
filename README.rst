@@ -1,7 +1,3 @@
-RSSBOT
-######
-
-
 NAME
 
 ::
@@ -102,7 +98,7 @@ replace "<user>" with the user running pipx
     WorkingDirectory=/home/<user>/.rssbot
     ExecStart=/home/<user>/.local/pipx/venvs/rssbot/bin/rssbotd
     PIDFile=/home/<user>/.rssbot/rssbot.pid
-    RemainAfterExit=no
+    RemainAfterExit=yes
 
     [Install]
     WantedBy=default.target

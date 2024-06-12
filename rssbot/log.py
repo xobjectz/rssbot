@@ -21,14 +21,8 @@ def debug(txt):
         Logging.out(txt) # pylint: disable=E1102
 
 
-def enable(func):
-    "set output function."
-    Logging.out = func
-
-
 def __dir__():
     return (
         'Logging',
-        'debug',
-        'enable'
+        'debug'
     )

@@ -5,17 +5,19 @@
 
 
 import os
-import time
 
 
-from .disk import fetch, long, store, strip
-from .object import Default, fqn, search, update
+from .classes import Classes
+from .default import Default
+from .object  import fqn, search, update
+from .disk    import Workdir, fetch
+from .utils   import fntime, strip
 
 
 def fns(mtc=""):
     "show list of files."
     dname = ''
-    pth = store(mtc)
+    pth = Workdir.store(mtc)
     for rootdir, dirs, _files in os.walk(pth, topdown=False):
         if dirs:
             for dname in sorted(dirs):
@@ -26,23 +28,9 @@ def fns(mtc=""):
                         yield strip(os.path.join(ddd, fll))
 
 
-def fntime(daystr):
-    "convert file name to it's saved time."
-    daystr = daystr.replace('_', ':')
-    datestr = ' '.join(daystr.split(os.sep)[-2:])
-    if '.' in datestr:
-        datestr, rest = datestr.rsplit('.', 1)
-    else:
-        rest = ''
-    timed = time.mktime(time.strptime(datestr, '%Y-%m-%d %H:%M:%S'))
-    if rest:
-        timed += float('.' + rest)
-    return timed
-
-
 def find(mtc, selector=None, index=None, deleted=False):
     "find object matching the selector dict."
-    clz = long(mtc)
+    clz = Classes.long(mtc)
     nrs = -1
     result = []
     for fnm in sorted(fns(clz), key=fntime):
@@ -78,7 +66,6 @@ def last(obj, selector=None):
 def __dir__():
     return (
         'fns',
-        'fntime',
         'find',
         'last'
     )
