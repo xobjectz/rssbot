@@ -19,13 +19,16 @@ import _thread
 sys.path.insert(0, os.getcwd())
 
 
-from rssbot.client  import Client, Command, laps, parse
-from rssbot.disk    import Workdir
-from rssbot.handler import Event
-from rssbot.log     import debug, enable
-from rssbot.object  import Default, Object, keys
-from rssbot.run     import scan
-from rssbot.thread  import errors, launch
+from rssbot.client   import Client, scan
+from rssbot.commands import Commands
+from rssbot.default  import Default
+from rssbot.errors   import Errors, errors
+from rssbot.event    import Event
+from rssbot.log      import Logging, debug
+from rssbot.object   import Object, keys
+from rssbot.parser   import parse
+from rssbot.thread   import launch
+from rssbot.utils    import laps
 
 
 from rssbot import modules
@@ -38,20 +41,18 @@ PERCALL = 1
 STARTTIME = time.time()
 
 
-path = os.path.dirname(modules.__file__)
+path    = os.path.dirname(modules.__file__)
+workdir = ".test"
 
 
-Cfg             = Default()
-Cfg.debug       = True
-Cfg.mod         = ""
-Cfg.name        = "tinder"
-Cfg.silent      = False
-Cfg.skip        = ["debug",]
-Cfg.version     = "19"
-Cfg.wdr         = ".test"
-
-
-Workdir.workdir = Cfg.wdr
+Cfg         = Default()
+Cfg.debug   = True
+Cfg.mod     = ""
+Cfg.name    = "tinder"
+Cfg.silent  = False
+Cfg.skip    = ["debug",]
+Cfg.version = "13"
+Cfg.wdr     = ".test"
 
 
 events = []
@@ -66,12 +67,11 @@ param.cfg = [
     "commands=true",
     ""]
 param.cmd = [""]
-param.fnd = ["fnd rss", "fnd seen", ""]
 param.dpl = ["hnrss title,summary,link"]
 param.mre = ["2"]
 param.nme = ["hnrss hackernews"]
 param.pwd = ["bart bla"]
-#param.rem = ["hnrss"]
+param.rem = ["hnrss"]
 param.rss = ["http://hnrss.org/newest"]
 param.ver = [""]
 
@@ -113,7 +113,7 @@ def lsmod(pth):
 
 def payload(clt):
     "do payload."
-    cmds = sorted(list(keys(Command.cmds)))
+    cmds = sorted(list(keys(Commands.cmds)))
     #random.shuffle(cmds)
     with paylock:
         nmr = 0
@@ -150,7 +150,7 @@ def main():
     "main"
     scan(modules, Cfg.mod)
     nrs = Cfg.index or 1
-    nrcommand = len(Command.cmds) or 1
+    nrcommand = len(Commands.cmds) or 1
     thrs = []
     cli = CLI()
     cli.start()
@@ -166,14 +166,12 @@ def main():
 
 
 if __name__ == "__main__":
+    Logging.out = Errors.out = print
     parse(Cfg, " ".join(sys.argv[1:]))
     if "f" in Cfg.opts:
-        if os.path.exists(Workdir.workdir):
-            shutil.rmtree(Workdir.workdir)
-    if Cfg.wdr:
-        Workdir.workdir = Cfg.wdr
-    Cfg.mod = ",".join(modules.__dir__())
-    enable(print)
+        if os.path.exists(workdir):
+            shutil.rmtree(workdir)
+    Cfg.mod = lsmod(path)
     dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
     debug(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
     if "p" in Cfg.opts:

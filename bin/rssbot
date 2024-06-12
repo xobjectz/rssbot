@@ -50,7 +50,7 @@ from rssbot import modules
 
 Cfg             = Default()
 Cfg.dis         = ""
-Cfg.mod         = "cmd,irc,rss"
+Cfg.mod         = "cmd,irc,opm,rss"
 Cfg.name        = "rssbot"
 Cfg.opts        = ""
 Cfg.version     = "560"
