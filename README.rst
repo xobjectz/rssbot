@@ -1,13 +1,9 @@
 NAME
 
-::
-
     RSSBOT - 24/7 feed Fetcher
 
 
 INSTALL
-
-::
 
     $ pipx install rssbot
     $ pipx ensurepath
@@ -15,15 +11,11 @@ INSTALL
 
 SYNOPSIS
 
-::
-
     rssbot <cmd> [key=val] [key==val]
     rssbotd
 
 
 DESCRIPTION
-
-::
 
     RSSBOT is a python3 bot able to display rss feeds in your channel.
 
@@ -33,8 +25,6 @@ DESCRIPTION
 
 
 COMMANDS
-
-::
 
     cfg - irc configuration
     cmd - commands
@@ -49,22 +39,16 @@ CONFIGURATION
 
 irc
 
-::
-
     $ rssbot cfg server=<server>
     $ rssbot cfg channel=<channel>
     $ rssbot cfg nick=<nick>
 
 sasl
 
-::
-
     $ rssbot pwd <nsvnick> <nspass>
     $ rssbot cfg password=<frompwd>
 
 rss
-
-::
 
     $ rssbot rss <url>
     $ rssbot dpl <url> <item1,item2>
@@ -72,8 +56,6 @@ rss
     $ rssbot nme <url> <name>
 
 opml
-
-::
 
     $ rssbot exp
     $ rssbot imp <filename>
@@ -106,8 +88,6 @@ replace "<user>" with the user running pipx
 
 then run this
 
-::
-
     $ mkdir ~/.rssbot
     $ sudo systemctl enable rssbot --now
 
@@ -115,8 +95,6 @@ default channel/server is #rssbot on localhost
 
 
 FILES
-
-::
 
     ~/.rssbot
     ~/.local/bin/rssbot
@@ -126,13 +104,9 @@ FILES
 
 AUTHOR
 
-::
-
     Bart Thate <bthate@dds.nl>
 
 
 COPYRIGHT
-
-::
 
     RSSBOT is Public Domain.
