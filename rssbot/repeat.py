@@ -1,11 +1,11 @@
 # This file is placed in the Public Domain.
 
 
-"repeater"
+"at repeating intervals"
 
 
+from .launch import launch
 from .timer  import Timer
-from .thread import launch
 
 
 class Repeater(Timer):

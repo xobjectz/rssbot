@@ -1,136 +1,54 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C0413,W0212,W0611
+# pylint: disable=C0413,W0212,E0401
 
 
-"""RSSBOT
-
-    rssbot  <cmd> [key=val] [key==val]
-    rssbot  [-a] [-c] [-h] [-v]
-    rssbotd
-
-    options are:
-
-    -a     load all modules
-    -c     start console
-    -h     show help
-    -v     use verbose
-
-    the cmd command show available commands.
-    
-    $ rssbot cmd
-    cfg,cmd,dpl,err,exp,imp,mod,mre,nme,pwd,rem,res,rss,thr
-
-"""
+"main"
 
 
-import getpass
 import os
-import pathlib
-import pwd
-import readline
 import sys
-import termios
-import time
 
 
-from rssbot.client  import Client, cmnd, init, scan
-from rssbot.default import Default
-from rssbot.disk    import Workdir
-from rssbot.errors  import Errors, errors
-from rssbot.event   import Event
-from rssbot.log     import Logging, debug
-from rssbot.parser  import parse
-from rssbot.run     import broker
+sys.path.insert(0, os.getcwd())
+
+
+from rssbot.cfg    import Config
+from rssbot.defer  import errors
+from rssbot.disk   import Persist
+from rssbot.main   import cmnd
+from rssbot.parse  import parse
 
 
 from rssbot import modules
+from rssbot import user
 
 
-Cfg             = Default()
-Cfg.dis         = ""
-Cfg.mod         = "cmd,irc,opm,rss"
-Cfg.name        = "rssbot"
-Cfg.opts        = ""
-Cfg.version     = "560"
-Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
-Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
+Cfg         = Config()
+Cfg.dis     = ""
+Cfg.mod     = "mod,cmd,err,thr"
+Cfg.name    = "rssbot"
+Cfg.opts    = ""
+Cfg.wdr     = os.path.expanduser(f"~/.{Cfg.name}")
+Cfg.pidfile = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
 
-Workdir.workdir = Cfg.wdr
+Persist.workdir = Cfg.wdr
 
 
-class Console(Client):
-
-    "Console"
-
-    def __init__(self):
-        Client.__init__(self)
-        broker.add(self)
-
-    def announce(self, txt):
-        "disable announce."
-
-    def callback(self, evt):
-        "wait for callback."
-        Client.callback(self, evt)
-        evt.wait()
-
-    def poll(self):
-        "poll console and create event."
-        evt = Event()
-        evt.orig = object.__repr__(self)
-        evt.txt = input("> ")
-        evt.type = "command"
-        return evt
-
-    def say(self, _channel, txt):
-        "print to console"
-        txt = txt.encode('utf-8', 'replace').decode()
-        print(txt)
-
-
-def wrap(func):
-    "restore console."
-    old2 = None
-    try:
-        old2 = termios.tcgetattr(sys.stdin.fileno())
-    except termios.error:
-        pass
-    try:
-        func()
-    except (KeyboardInterrupt, EOFError):
-        print("")
-    finally:
-        if old2:
-            termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old2)
-    errors()
+def modnames():
+    "list all modules."
+    return sorted({x for x in dir(modules) + dir(user) if not x.startswith("__")})
 
 
 def main():
     "main"
     parse(Cfg, " ".join(sys.argv[1:]))
-    Workdir.skel()
-    if "v" in Cfg.opts and "d" not in Cfg.opts:
-        Errors.out = Logging.out = print
-    if "a" in Cfg.opts:
-        Cfg.mod = ",".join(modules.__dir__())
-    if "v" in Cfg.opts:
-        dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
-        debug(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}')
-    if "h" in Cfg.opts:
-        print(__doc__)
-    scan(modules, Cfg.mod, Cfg.sets.dis)
-    if "c" in Cfg.opts:
-        init(modules, Cfg.mod, Cfg.sets.dis)
-        csl = Console()
-        csl.start()
-        while 1:
-            time.sleep(1.0)
-    elif Cfg.otxt:
-        cmnd(Cfg.otxt, print)
+    Cfg.dis = Cfg.sets.dis
+    Cfg.mod = ",".join(modnames())
+    cmnd(Cfg.otxt, print)
 
 
 if __name__ == "__main__":
-    wrap(main)
+    main()
+    errors()

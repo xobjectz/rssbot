@@ -4,7 +4,7 @@
 "parsing"
 
 
-from .default import Default
+from .dft import Default
 
 
 def parse(obj, txt=None):

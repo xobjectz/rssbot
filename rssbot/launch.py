@@ -1,7 +1,8 @@
 # This file is placed in the Public Domain.
+# pylint: disable=W0718
 
 
-"threads with deferred exception handling."
+"threads"
 
 
 import queue
@@ -9,8 +10,8 @@ import threading
 import time
 
 
-from .errors import later
-from .utils  import named
+from .defer import later
+from .utils import named
 
 
 class Thread(threading.Thread):
@@ -43,7 +44,7 @@ class Thread(threading.Thread):
         func, args = self.queue.get()
         try:
             self._result = func(*args)
-        except Exception as ex: # pylint: disable=W0718
+        except Exception as ex:
             later(ex)
             if args and "Event" in str(type(args[0])):
                 args[0].ready()

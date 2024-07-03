@@ -10,13 +10,13 @@
 import unittest
 
 
-from rssbot.modules.opm import Parser
+from rssbot.modules.rss import OPMLParser
 
 
 class TestAttrs(unittest.TestCase):
 
     def test_attrs(self):
-        res = Parser.parse(TXT, "outline")
+        res = OPMLParser.parse(TXT, "outline")
         self.assertTrue(len(res) == 50)
 
 

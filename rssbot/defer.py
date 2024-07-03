@@ -1,4 +1,5 @@
 # This file is placed in the Public Domain.
+# pylint: disable=W0125,E1102
 
 
 "deferred exception handling."
@@ -8,12 +9,12 @@ import io
 import traceback
 
 
-class Errors: # pylint: disable=R0903
+class Errors:
 
     "Errors"
 
     errors = []
-    out    = None
+    out    = print
 
     @staticmethod
     def format(exc):
@@ -34,7 +35,7 @@ class Errors: # pylint: disable=R0903
     def output(exc):
         "check if output function is set."
         if Errors.out:
-            Errors.out(Errors.format(exc)) # pylint: disable=E1102
+            Errors.out(Errors.format(exc))
 
 
 def errors():

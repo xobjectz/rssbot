@@ -1,19 +1,14 @@
 # This file is placed in the Public Domain.
+# pylint: disable=R0902,W0105
 
 
-"clean namespace"
+"a clean namespace"
 
 
 import datetime
-import json
-import pathlib
-import _thread
 
 
-lock = _thread.allocate_lock()
-
-
-class Object: # pylint: disable=R0902
+class Object:
 
     "Object"
 
@@ -119,18 +114,11 @@ def keys(obj):
 
 
 def match(obj, txt):
-    "check if object matches provided values."
+    "check if object has matching keys."
     for key in keys(obj):
         if txt in key:
             return True
     return False
-
-
-def read(obj, pth):
-    "read an object from file path."
-    with lock:
-        with open(pth, 'r', encoding='utf-8') as ofile:
-            update(obj, load(ofile))
 
 
 def search(obj, selector):
@@ -163,107 +151,7 @@ def values(obj):
     return obj.__dict__.values()
 
 
-def write(obj, pth):
-    "write an object to disk."
-    with lock:
-        cdir(pth)
-        with open(pth, 'w', encoding='utf-8') as ofile:
-            dump(obj, ofile, indent=4)
-
-
-class ObjectDecoder(json.JSONDecoder):
-
-    "ObjectDecoder"
-
-    def __init__(self, *args, **kwargs):
-        json.JSONDecoder.__init__(self, *args, **kwargs)
-
-    def decode(self, s, _w=None):
-        "decoding string to object."
-        val = json.JSONDecoder.decode(self, s)
-        if not val:
-            val = {}
-        return hook(val)
-
-    def raw_decode(self, s, idx=0):
-        "decode partial string to object."
-        return json.JSONDecoder.raw_decode(self, s, idx)
-
-
-def hook(objdict, typ=None):
-    "construct object from dict."
-    if typ:
-        obj = typ()
-    else:
-        obj = Object()
-    construct(obj, objdict)
-    return obj
-
-
-def load(fpt, *args, **kw):
-    "load object from file."
-    kw["cls"] = ObjectDecoder
-    kw["object_hook"] = hook
-    return json.load(fpt, *args, **kw)
-
-
-def loads(string, *args, **kw):
-    "load object from string."
-    kw["cls"] = ObjectDecoder
-    kw["object_hook"] = hook
-    return json.loads(string, *args, **kw)
-
-
-class ObjectEncoder(json.JSONEncoder):
-
-    "ObjectEncoder"
-
-    def __init__(self, *args, **kwargs):
-        json.JSONEncoder.__init__(self, *args, **kwargs)
-
-    def default(self, o): # pylint: disable=R0911
-        "return stringable value."
-        if isinstance(o, dict):
-            return o.items()
-        if isinstance(o, Object):
-            return vars(o)
-        if isinstance(o, list):
-            return iter(o)
-        if isinstance(o, (type(str), type(True), type(False), type(int), type(float))):
-            return o
-        try:
-            return json.JSONEncoder.default(self, o)
-        except TypeError:
-            try:
-                return o.__dict__
-            except AttributeError:
-                return repr(o)
-
-    def encode(self, o) -> str:
-        "encode object to string."
-        return json.JSONEncoder.encode(self, o)
-
-    def iterencode(self, o, _one_shot=False):
-        "loop over object to encode to string."
-        return json.JSONEncoder.iterencode(self, o, _one_shot)
-
-
-def dump(*args, **kw):
-    "dump object to file."
-    kw["cls"] = ObjectEncoder
-    return json.dump(*args, **kw)
-
-
-def dumps(*args, **kw):
-    "dump object to string."
-    kw["cls"] = ObjectEncoder
-    return json.dumps(*args, **kw)
-
-
-def cdir(pth):
-    "create directory."
-    path = pathlib.Path(pth)
-    path.parent.mkdir(parents=True, exist_ok=True)
+"interface"
 
 
 def pjoin(*args):
@@ -275,20 +163,14 @@ def __dir__():
     return (
         'Object',
         'construct',
-        'dump',
         'edit',
         'fmt',
         'fqn',
-        'dumps',
-        'hook',
         'ident',
-        'keys',
-        'load',
         'items',
-        'loads',
+        'keys',
+        'match',
         'search',
         'update',
-        'read',
         'values',
-        'write'
     )

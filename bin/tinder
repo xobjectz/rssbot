@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C,R,W0105,E0401
+# pylint: disable=C0413
 
 
-"created clients"
+"tinder"
 
 
 import os
@@ -19,30 +19,27 @@ import _thread
 sys.path.insert(0, os.getcwd())
 
 
-from rssbot.client   import Client, scan
-from rssbot.commands import Commands
-from rssbot.default  import Default
-from rssbot.errors   import Errors, errors
-from rssbot.event    import Event
-from rssbot.log      import Logging, debug
-from rssbot.object   import Object, keys
-from rssbot.parser   import parse
-from rssbot.thread   import launch
-from rssbot.utils    import laps
-
+from rssbot.face import *
 
 from rssbot import modules
+from rssbot import user
+
+
+modules.rss.DEBUG = True
+
+
+if os.path.exists("mods"):
+    import mods as MODS
+else:
+    MODS = None
 
 
 LAP = 1
 NRS = 1
 NRCOMMAND = 1
-PERCALL = 1
+PERCALL   = 1
 STARTTIME = time.time()
-
-
-path    = os.path.dirname(modules.__file__)
-workdir = ".test"
+CLI.out   = print
 
 
 Cfg         = Default()
@@ -51,8 +48,10 @@ Cfg.mod     = ""
 Cfg.name    = "tinder"
 Cfg.silent  = False
 Cfg.skip    = ["debug",]
-Cfg.version = "13"
 Cfg.wdr     = ".test"
+
+
+Persist.workdir = Cfg.wdr
 
 
 events = []
@@ -60,35 +59,27 @@ paylock = _thread.allocate_lock()
 
 
 param = Object()
-param.cfg = [
-    "server=localhost",
-    "nick=mekker",
-    "port=6697",
-    "commands=true",
-    ""]
 param.cmd = [""]
-param.dpl = ["hnrss title,summary,link"]
-param.mre = ["2"]
+param.dpl = ["hnrss title,url"]
+param.fnd = ["log", "todo", "rss", "config"]
+param.imp = ["files/feeds.opml"]
+param.log = ["bla"]
+param.mod = [""]
+param.mre = [""]
 param.nme = ["hnrss hackernews"]
-param.pwd = ["bart bla"]
+param.pwd = ["bla mekker"]
 param.rem = ["hnrss"]
-param.rss = ["http://hnrss.org/newest"]
+param.res = [""]
+param.rss = ["http://hnrss.org/newest",]
+param.tdo = ["mekker"]
 param.ver = [""]
 
 
-class CLI(Client):
-
-    "CLI"
-
-    def say(self, _channel, txt):
-        "echo on verbose."
-        if "v" not in Cfg.opts:
-            return
-        self.raw(txt)
+class CLII(CLI):
 
     def raw(self, txt):
-        "print to screen."
-        print(txt)
+        if "v" in Cfg.opts:
+            print(txt)
 
 
 def consume(evts):
@@ -106,22 +97,22 @@ def consume(evts):
     return res
 
 
-def lsmod(pth):
-    "return list of modules in a directory."
-    return ",".join(sorted([x[:-3] for x in os.listdir(pth) if not x.startswith("__") and not x.endswith("~")]))
+def modnames():
+    "list all modules."
+    return sorted({x for x in dir(modules) + dir(user) + dir(MODS) if not x.startswith("__")})
 
 
 def payload(clt):
     "do payload."
     cmds = sorted(list(keys(Commands.cmds)))
-    #random.shuffle(cmds)
     with paylock:
         nmr = 0
-        for cmd in cmds:
-            for ex in getattr(param, cmd, [""]):
+        for cmdd in cmds:
+            for ex in getattr(param, cmdd, [""]):
                 evt = Event()
-                evt.orig = object.__repr__(clt)
-                evt.txt = cmd + " " + ex
+                evt.channel = "#objr"
+                evt.orig = repr(clt)
+                evt.txt = cmdd + " " + ex
                 evt.type = "command"
                 clt.put(evt)
                 events.append(evt)
@@ -143,17 +134,22 @@ def wrap(func):
     finally:
         if old2:
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old2)
-    errors()
-    
+
 
 def main():
     "main"
-    scan(modules, Cfg.mod)
+    Logging.out = Errors.out = print
+    Cfg.dis = Cfg.sets.dis
+    Cfg.mod = ",".join(modnames())
+    if "v" in Cfg.opts:
+        DTE = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
+        print(f'{DTE} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
     nrs = Cfg.index or 1
     nrcommand = len(Commands.cmds) or 1
-    thrs = []
-    cli = CLI()
+    cli = CLII()
     cli.start()
+    cli.threaded = "t" in Cfg.opts
+    thrs = []
     for _nr in range(nrs):
         thrs.append(launch(payload, cli))
     for thr in thrs:
@@ -162,20 +158,24 @@ def main():
     endtime = time.time()
     lap = laps(endtime-STARTTIME)
     percall = (endtime-STARTTIME)/(nrs*nrcommand)
-    print(f"{lap} {nrs} {nrcommand} {percall}")
+    if not Errors.errors:
+        if "v" in Cfg.opts:
+            print("no errors")
+    else:
+        errors()
+    if "v" in Cfg.opts:
+        print(f"{lap} {nrs} {nrcommand} {percall}")
 
 
 if __name__ == "__main__":
-    Logging.out = Errors.out = print
     parse(Cfg, " ".join(sys.argv[1:]))
     if "f" in Cfg.opts:
-        if os.path.exists(workdir):
-            shutil.rmtree(workdir)
-    Cfg.mod = lsmod(path)
-    dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
-    debug(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
+        if os.path.exists(Persist.workdir):
+            shutil.rmtree(Persist.workdir)
+    skel()
     if "p" in Cfg.opts:
         profile.runctx(main.__code__, globals(), locals())
     else:
         wrap(main)
+    errors()
     sys.exit()
