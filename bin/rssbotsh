@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+# This file is placed in the Public Domain.
+# pylint: disable=C0413,W0212,E0401
+
+
+"main"
+
+
+import os
+import readline
+import sys
+import termios
+import time
+
+
+sys.path.insert(0, os.getcwd())
+
+
+from rssbot.cfg   import Config
+from rssbot.cli   import CLI
+from rssbot.defer import errors
+from rssbot.event import Event
+from rssbot.main  import cmnd, init
+from rssbot.parse import parse
+from rssbot.disk  import Persist, skel
+
+
+from rssbot import modules
+from rssbot import user
+
+
+if os.path.exists("mods"):
+    import mods as MODS
+else:
+    MODS = None
+
+
+Cfg         = Config()
+Cfg.dis     = ""
+Cfg.mod     = "cmd,mod,thr,err"
+Cfg.opts    = ""
+Cfg.name    = "rssbot"
+Cfg.wdr     = os.path.expanduser(f"~/.{Cfg.name}")
+Cfg.pidfile = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
+
+
+Persist.workdir = Cfg.wdr
+
+
+class Console(CLI):
+
+    "Console"
+
+    def announce(self, txt):
+        "disable announce."
+
+    def callback(self, evt):
+        "wait for callback."
+        CLI.callback(self, evt)
+        evt.wait()
+
+    def poll(self):
+        "poll console and create event."
+        evt = Event()
+        evt.txt = input("> ")
+        evt.type = "command"
+        return evt
+
+
+def forever():
+    "don't stop, until ctrl-c."
+    while True:
+        time.sleep(1.0)
+
+
+def modnames():
+    "list all modules."
+    return sorted({x for x in dir(modules) + dir(user) + dir(MODS) if not x.startswith("__")})
+
+
+def wrap(func):
+    "reset terminal."
+    old3 = None
+    try:
+        old3 = termios.tcgetattr(sys.stdin.fileno())
+    except termios.error:
+        pass
+    try:
+        func()
+    except (KeyboardInterrupt, EOFError):
+        print("")
+    finally:
+        if old3:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old3)
+
+
+def wrapped():
+    "wrap main."
+    wrap(main)
+    errors()
+
+
+def main():
+    "main"
+    readline.redisplay()
+    skel()
+    parse(Cfg, " ".join(sys.argv[1:]))
+    Cfg.dis = Cfg.sets.dis
+    Cfg.mod += "," + ",".join(modnames())
+    if "v" in Cfg.opts:
+        dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
+        modiess = ",".join([x.upper() for x in modnames()])
+        print(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {modiess}'.replace("  ", " "))
+    csl = Console(print)
+    if "i" in Cfg.opts:
+        init(modules, Cfg.mod, Cfg.dis)
+        init(user, Cfg.mod, Cfg.dis)
+        init(MODS, Cfg.mod, Cfg.dis)
+    csl.start()
+    cmnd(Cfg.otxt, print)
+    forever()
+
+
+if __name__ == "__main__":
+    wrapped()
