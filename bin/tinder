@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C0413
+# pylint: disable=C0413,W0201,W0401,W0614,E0401
 
 
 "tinder"
@@ -26,12 +26,6 @@ from rssbot import user
 
 
 modules.rss.DEBUG = True
-
-
-if os.path.exists("mods"):
-    import mods as MODS
-else:
-    MODS = None
 
 
 LAP = 1
@@ -77,6 +71,8 @@ param.ver = [""]
 
 class CLII(CLI):
 
+    "command line interface."
+
     def raw(self, txt):
         if "v" in Cfg.opts:
             print(txt)
@@ -99,15 +95,15 @@ def consume(evts):
 
 def modnames():
     "list all modules."
-    return sorted({x for x in dir(modules) + dir(user) + dir(MODS) if not x.startswith("__")})
+    return sorted({x for x in dir(modules) + dir(user) if not x.startswith("__")})
 
 
 def payload(clt):
     "do payload."
-    cmds = sorted(list(keys(Commands.cmds)))
+    cmdz = sorted(list(keys(Commands.cmds)))
     with paylock:
         nmr = 0
-        for cmdd in cmds:
+        for cmdd in cmdz:
             for ex in getattr(param, cmdd, [""]):
                 evt = Event()
                 evt.channel = "#objr"
@@ -142,16 +138,16 @@ def main():
     Cfg.dis = Cfg.sets.dis
     Cfg.mod = ",".join(modnames())
     if "v" in Cfg.opts:
-        DTE = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
-        print(f'{DTE} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
+        dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
+        print(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
     nrs = Cfg.index or 1
     nrcommand = len(Commands.cmds) or 1
-    cli = CLII()
-    cli.start()
-    cli.threaded = "t" in Cfg.opts
+    clt = CLII()
+    clt.start()
+    clt.threaded = "t" in Cfg.opts
     thrs = []
     for _nr in range(nrs):
-        thrs.append(launch(payload, cli))
+        thrs.append(launch(payload, clt))
     for thr in thrs:
         thr.join()
     consume(events)

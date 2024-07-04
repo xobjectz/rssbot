@@ -68,6 +68,7 @@ CONFIGURATION
     $ rssbot rss <url>
     $ rssbot dpl <url> <item1,item2>
     $ rssbot rem <url>
+    $ rssbot res <url>
     $ rssbot nme <url> <name>
 
     opml
