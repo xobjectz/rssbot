@@ -117,6 +117,7 @@ FILES
     ~/.rssbot
     ~/.local/bin/rssbot
     ~/.local/bin/rssbotd
+    ~/.local/bin/rssbotsh
     ~/.local/pipx/venvs/rssbot/
 
 
