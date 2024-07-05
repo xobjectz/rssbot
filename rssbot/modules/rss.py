@@ -24,6 +24,7 @@ from ..cmds   import add
 from ..dft    import Default
 from ..object import Object, construct, fmt, update
 from ..disk   import find, last, sync, whitelist
+from ..ool    import OoL
 from ..repeat import Repeater
 from ..launch import launch
 from ..log    import debug
@@ -76,16 +77,24 @@ class Rss(Default):
 whitelist(Rss)
 
 
-class Seen(Default):
+class UrlsSeen(OoL):
 
     "Seen"
 
     def __init__(self):
-        Default.__init__(self)
-        self.urls = []
+        OoL.__init__(self)
+        self.nrlinks = Object()
+
+    def add(self, url, item):
+        links = getattr(self, url, None)
+        if links:
+            nrs = getattr(self.nrlinks, url, None) 
+            if nrs and len(links) > nrs:
+                links.pop(0)
+        super().add(url, item)
 
 
-whitelist(Seen)
+whitelist(UrlsSeen)
 
 
 class Fetcher(Object):
@@ -94,7 +103,7 @@ class Fetcher(Object):
 
     def __init__(self):
         self.dosave = False
-        self.seen = Seen()
+        self.seen = UrlsSeen()
         self.seenfn = None
         broker.register(self)
 
@@ -126,6 +135,7 @@ class Fetcher(Object):
             counter = 0
             result = []
             for obj in reversed(getfeed(feed.rss, feed.display_list)):
+                counter += 1
                 fed = Feed()
                 update(fed, obj)
                 update(fed, feed)
@@ -134,13 +144,14 @@ class Fetcher(Object):
                     uurl = f'{url.scheme}://{url.netloc}/{url.path}'
                 else:
                     uurl = fed.link
-                if uurl in self.seen.urls:
+                if uurl in getattr(self.seen, feed.rss, []):
                     continue
-                self.seen.urls.append(uurl)
-                counter += 1
+                self.seen.add(feed.rss, uurl)
                 if self.dosave:
                     sync(fed)
                 result.append(fed)
+            if counter > getattr(self.seen.nrlinks, feed.rss, 0):
+                setattr(self.seen.nrlinks, feed.rss, counter)
         self.seenfn = sync(self.seen, self.seenfn)
         if silent:
             return counter
