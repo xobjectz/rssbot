@@ -84,7 +84,7 @@ def long(name):
     split = name.split(".")[-1].lower()
     res = name
     for named in types():
-        if split in named.split(".")[-1].lower():
+        if split == named.split(".")[-1].lower():
             res = named
             break
     return res
