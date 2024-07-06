@@ -23,7 +23,7 @@ from rssbot.main  import init
 
 
 from rssbot import modules
-from rsbbot import user
+from rssbot import user
 
 
 Cfg         = Config()

@@ -77,7 +77,7 @@ class Rss(Default):
 whitelist(Rss)
 
 
-class UrlsSeen(OoL):
+class Seens(OoL):
 
     "Seen"
 
@@ -94,7 +94,7 @@ class UrlsSeen(OoL):
         super().add(url, item)
 
 
-whitelist(UrlsSeen)
+whitelist(Seens)
 
 
 class Fetcher(Object):
@@ -103,7 +103,7 @@ class Fetcher(Object):
 
     def __init__(self):
         self.dosave = False
-        self.seen = UrlsSeen()
+        self.seen = Seens()
         self.seenfn = None
         broker.register(self)
 
