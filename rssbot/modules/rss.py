@@ -36,7 +36,7 @@ def init():
     "start fetcher."
     fetcher = Fetcher()
     fetcher.start()
-    debug(f"started {fmt(fetcher)}")
+    debug(f'started rss {fmt(fetcher,skip="seen")}')
     return fetcher
 
 
