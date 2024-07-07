@@ -19,10 +19,12 @@ sys.path.insert(0, os.getcwd())
 from rssbot.cfg   import Config
 from rssbot.cli   import CLI
 from rssbot.defer import errors
+from rssbot.disk  import Persist, skel
 from rssbot.event import Event
 from rssbot.main  import cmnd, init
 from rssbot.parse import parse
-from rssbot.disk  import Persist, skel
+from rssbot.term  import Console
+from rssbot.utils import forever, modnames
 
 
 from rssbot import modules
@@ -33,6 +35,8 @@ if os.path.exists("mods"):
     import mods as MODS
 else:
     MODS = None
+
+print(MODS)
 
 
 Cfg         = Config()
@@ -45,37 +49,6 @@ Cfg.pidfile = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
 
 Persist.workdir = Cfg.wdr
-
-
-class Console(CLI):
-
-    "Console"
-
-    def announce(self, txt):
-        "disable announce."
-
-    def callback(self, evt):
-        "wait for callback."
-        CLI.callback(self, evt)
-        evt.wait()
-
-    def poll(self):
-        "poll console and create event."
-        evt = Event()
-        evt.txt = input("> ")
-        evt.type = "command"
-        return evt
-
-
-def forever():
-    "don't stop, until ctrl-c."
-    while True:
-        time.sleep(1.0)
-
-
-def modnames():
-    "list all modules."
-    return sorted({x for x in dir(modules) + dir(user) + dir(MODS) if not x.startswith("__")})
 
 
 def wrap(func):
@@ -92,11 +65,6 @@ def wrap(func):
     finally:
         if old3:
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old3)
-
-
-def wrapped():
-    "wrap main."
-    wrap(main)
     errors()
 
 
@@ -106,12 +74,12 @@ def main():
     skel()
     parse(Cfg, " ".join(sys.argv[1:]))
     Cfg.dis = Cfg.sets.dis
-    Cfg.mod += "," + ",".join(modnames())
+    Cfg.mod += "," + ",".join(modnames(modules, user, MODS))
     if "v" in Cfg.opts:
         dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
-        modiess = ",".join([x.upper() for x in modnames()])
+        modiess = ",".join([x.upper() for x in modnames(modules, user, MODS)])
         print(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {modiess}'.replace("  ", " "))
-    csl = Console(print)
+    csl = Console(print, input)
     if "i" in Cfg.opts:
         init(modules, Cfg.mod, Cfg.dis)
         init(user, Cfg.mod, Cfg.dis)
@@ -122,4 +90,4 @@ def main():
 
 
 if __name__ == "__main__":
-    wrapped()
+    wrap(main)

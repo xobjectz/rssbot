@@ -46,9 +46,10 @@ class Thread(threading.Thread):
             self._result = func(*args)
         except Exception as ex:
             later(ex)
-            if args and "Event" in str(type(args[0])):
-                args[0].ready()
-
+            try:
+                args[1].ready()
+            except IndexError:
+                pass
 
 def launch(func, *args, **kwargs):
     "launch a thread."

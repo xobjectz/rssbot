@@ -83,6 +83,14 @@ def laps(seconds, short=True):
     return txt
 
 
+def modnames(*args):
+    "return module names."
+    res = []
+    for arg in args:
+        res.extend(dir(arg))
+    return sorted(res)
+
+
 def named(obj):
     "return a full qualified name of an object/function/module."
     if isinstance(obj, types.ModuleType):
@@ -119,7 +127,9 @@ def __dir__():
     return (
         'cdir',
         'fntime',
+        'forever',
         'laps',
+        'modnames',
         'named',
         'spl',
         'strip'
