@@ -87,7 +87,7 @@ def modnames(*args):
     "return module names."
     res = []
     for arg in args:
-        res.extend(dir(arg))
+        res.extend([x for x in dir(arg) if not x.startswith("__")])
     return sorted(res)
 
 

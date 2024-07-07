@@ -36,8 +36,6 @@ if os.path.exists("mods"):
 else:
     MODS = None
 
-print(MODS)
-
 
 Cfg         = Config()
 Cfg.dis     = ""
