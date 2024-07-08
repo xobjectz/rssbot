@@ -147,7 +147,7 @@ class Fetcher(Object):
                     uurl = fed.link
                 if uurl in getattr(self.seen, feed.rss, []):
                     continue
-                uadd(self, feed.rss, uurl)
+                uadd(self.seen, feed.rss, uurl)
                 if self.dosave:
                     sync(fed)
                 result.append(fed)
