@@ -26,6 +26,7 @@ def cmnd(txt, outer):
 
 
 def enable(outer):
+    "enable printing."
     CLI.out = Errors.out = Logging.out = outer
 
 
