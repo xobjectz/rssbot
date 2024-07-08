@@ -10,7 +10,7 @@ class Logging:
     "Logging"
 
     filter = []
-    out    = print
+    out    = None
 
 
 def debug(txt):

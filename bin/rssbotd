@@ -8,18 +8,17 @@
 
 import getpass
 import os
-import pathlib
 import pwd
 import sys
-import time
 
 
 from rssbot.cfg   import Config
 from rssbot.cli   import CLI
 from rssbot.defer import Errors, errors, later
-from rssbot.disk  import Persist, skel
+from rssbot.disk  import Persist, pidfile, skel
 from rssbot.log   import Logging
 from rssbot.main  import init
+from rssbot.utils import forever, modnames
 
 
 from rssbot import modules
@@ -59,27 +58,6 @@ def daemon(verbose=False):
     os.chdir("/")
 
 
-def pidfile(pid):
-    "write the pid to a file."
-    if os.path.exists(pid):
-        os.unlink(pid)
-    path = pathlib.Path(pid)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(pid, "w", encoding="utf-8") as fds:
-        fds.write(str(os.getpid()))
-
-
-def forever():
-    "it never ends, until ctl-c."
-    while True:
-        time.sleep(1.0)
-
-
-def modnames():
-    "list all modules."
-    return sorted({x for x in dir(modules) + dir(user) if not x.startswith("__")})
-
-
 def privileges(username):
     "drop privileges."
     pwnam = pwd.getpwnam(username)
@@ -106,7 +84,7 @@ def main():
     privileges(Cfg.user)
     if "-v" not in sys.argv:
         CLI.out = Errors.out = Logging.out = None
-    modstr = "," + ",".join(modnames())
+    modstr = "," + ",".join(modnames(modules, user))
     init(modules, modstr)
     init(user, modstr)
     forever()

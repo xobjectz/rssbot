@@ -14,7 +14,7 @@ class Errors:
     "Errors"
 
     errors = []
-    out    = print
+    out    = None
 
     @staticmethod
     def format(exc):
