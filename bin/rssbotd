@@ -82,9 +82,9 @@ def main():
     skel()
     pidfile(Cfg.pidfile)
     privileges(Cfg.user)
-    if "-v" not in sys.argv:
-        CLI.out = Errors.out = Logging.out = None
-    modstr = "," + ",".join(modnames(modules, user))
+    if "-v" in sys.argv:
+        enable(print)
+    modstr = ",".join(modnames(modules, user))
     init(modules, modstr)
     init(user, modstr)
     forever()

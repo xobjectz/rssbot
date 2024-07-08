@@ -7,8 +7,9 @@
 
 from .cli   import CLI
 from .cmds  import command
-from .defer import later
+from .defer import Errors, later
 from .event import Event
+from .log   import Logging
 from .utils import spl
 
 
@@ -22,6 +23,10 @@ def cmnd(txt, outer):
     command(cli, evn)
     evn.wait()
     return evn
+
+
+def enable(outer):
+    CLI.out = Errors.out = Logging.out = outer
 
 
 def init(pkg, modstr, disable=None):
@@ -45,6 +50,7 @@ def init(pkg, modstr, disable=None):
 def __dir__():
     return (
         'cmnd',
+        'enable',
         'init',
         'scan'
     )
