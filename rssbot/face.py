@@ -58,6 +58,7 @@ def __dir__():
         'later',
         'launch',
         'long',
+        'modnames',
         'named',
         'privileges',
         'read',

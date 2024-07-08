@@ -93,11 +93,6 @@ def consume(evts):
     return res
 
 
-def modnames():
-    "list all modules."
-    return sorted({x for x in dir(modules) + dir(user) if not x.startswith("__")})
-
-
 def payload(clt):
     "do payload."
     cmdz = sorted(list(keys(Commands.cmds)))
@@ -136,7 +131,7 @@ def main():
     "main"
     Logging.out = Errors.out = print
     Cfg.dis = Cfg.sets.dis
-    Cfg.mod = ",".join(modnames())
+    Cfg.mod = ",".join(modnames(modules, user))
     if "v" in Cfg.opts:
         dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
         print(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))

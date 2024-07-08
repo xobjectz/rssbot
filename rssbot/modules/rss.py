@@ -24,7 +24,7 @@ from ..cmds   import add
 from ..dft    import Default
 from ..object import Object, construct, fmt, update
 from ..disk   import find, last, sync, whitelist
-from ..ool    import OoL
+from ..ool    import OoL, ladd
 from ..repeat import Repeater
 from ..launch import launch
 from ..log    import debug
@@ -85,13 +85,14 @@ class Urls(OoL):
         OoL.__init__(self)
         self.nrlinks = Object()
 
-    def add(self, url, item):
-        links = getattr(self, url, None)
-        if links:
-            nrs = getattr(self.nrlinks, url, None) 
-            if nrs and len(links) > nrs:
-                links.pop(0)
-        super().add(url, item)
+def uadd(obj, url, item):
+    "urls add."
+    links = getattr(obj, url, None)
+    if links:
+        nrs = getattr(obj.nrlinks, url, None)
+        if nrs and len(links) > nrs:
+            links.pop(0)
+    ladd(obj, url, item)
 
 
 whitelist(Urls)
@@ -146,7 +147,7 @@ class Fetcher(Object):
                     uurl = fed.link
                 if uurl in getattr(self.seen, feed.rss, []):
                     continue
-                self.seen.add(feed.rss, uurl)
+                uadd(self, feed.rss, uurl)
                 if self.dosave:
                     sync(fed)
                 result.append(fed)
