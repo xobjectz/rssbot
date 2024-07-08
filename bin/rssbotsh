@@ -17,10 +17,8 @@ sys.path.insert(0, os.getcwd())
 
 
 from rssbot.cfg   import Config
-from rssbot.cli   import CLI
 from rssbot.defer import errors
 from rssbot.disk  import Persist, skel
-from rssbot.event import Event
 from rssbot.main  import cmnd, init
 from rssbot.parse import parse
 from rssbot.term  import Console
