@@ -1,4 +1,5 @@
 # This file is placed in the Public Domain.
+# ruff: noqa: F401
 
 
 "modules"
