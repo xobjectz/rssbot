@@ -1,5 +1,4 @@
 # This file is placed in the Public Domain.
-#
 # pylint: disable=R0903
 
 
@@ -16,6 +15,7 @@ class Commands:
 
     cmds     = Object()
     modnames = Object()
+
 
 def add(func):
     "add command."
@@ -38,6 +38,5 @@ def __dir__():
     return (
         'Commands',
         'add',
-        'command',
-        'modnames'
+        'command'
     )

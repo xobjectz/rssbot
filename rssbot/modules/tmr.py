@@ -13,7 +13,7 @@ import time as ttime
 from ..cmds   import add
 from ..disk   import find, sync
 from ..event  import Event
-from ..object import update
+from ..object import fmt, update
 from ..run    import fleet
 from ..timer  import Timer
 from ..utils  import laps
@@ -185,7 +185,7 @@ def tmr(event):
         for _fnm, obj in find('timer'):
             lap = float(obj.time) - ttime.time()
             if lap > 0:
-                event.reply(f'{nmr} {obj.txt} {laps(lap)}')
+                event.reply(f'{nmr} {obj.rest} {laps(lap)}')
                 nmr += 1
         if not nmr:
             event.reply("no timers")
@@ -219,6 +219,7 @@ def tmr(event):
     event.reply("ok " +  laps(diff))
     timer = Timer(diff, fleet.announce, event.rest, thrname=event.cmd)
     timer.time = target
+    update(timer, event)
     sync(timer)
     launch(timer.start)
     return res
