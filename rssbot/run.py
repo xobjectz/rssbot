@@ -4,13 +4,15 @@
 "runtime"
 
 
-from .cache  import Broker
-
+from .cache import Broker
+from .fleet import Fleet
 
 broker = Broker()
+fleet  = Fleet()
 
 
 def __dir__():
     return (
         'broker',
+        'fleet'
     )

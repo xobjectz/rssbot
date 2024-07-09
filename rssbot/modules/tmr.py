@@ -11,9 +11,10 @@ import time as ttime
 
 
 from ..cmds   import add
+from ..disk   import find, sync
 from ..event  import Event
 from ..object import update
-from ..run    import broker
+from ..run    import fleet
 from ..timer  import Timer
 from ..utils  import laps
 from ..launch import launch
@@ -21,14 +22,10 @@ from ..launch import launch
 
 def init():
     "initialaze modules."
-    for _fnm, obj in broker.all("timer"):
+    for _fnm, obj in find("timer"):
         diff = float(obj.time) - ttime.time()
         if diff > 0:
-            bot = broker.first("timer")
-            evt = Event()
-            update(evt, obj)
-            evt.orig = repr(bot)
-            timer = Timer(diff, evt.show)
+            timer = Timer(diff, fleet.announce)
             launch(timer.start)
 
 
@@ -185,7 +182,7 @@ def tmr(event):
     res = None
     if not event.rest:
         nmr = 0
-        for _fnm, obj in broker.all('timer'):
+        for _fnm, obj in find('timer'):
             lap = float(obj.time) - ttime.time()
             if lap > 0:
                 event.reply(f'{nmr} {obj.txt} {laps(lap)}')
@@ -217,14 +214,12 @@ def tmr(event):
     if not target or ttime.time() > target:
         event.reply("already passed given time.")
         return res
-    bot = broker.get(event.orig)
-    event.time = target
+    bot = fleet.get(event.orig)
     diff = target - ttime.time()
-    event.result = []
     event.reply("ok " +  laps(diff))
-    event.result.append(event.rest)
-    timer = Timer(diff, bot.show, event, thrname=event.cmd)
-    update(timer, event)
+    timer = Timer(diff, fleet.announce, event.rest, thrname=event.cmd)
+    timer.time = target
+    sync(timer)
     launch(timer.start)
     return res
 

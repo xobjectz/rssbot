@@ -28,7 +28,7 @@ from ..ool    import OoL, ladd
 from ..repeat import Repeater
 from ..launch import launch
 from ..log    import debug
-from ..run    import broker
+from ..run    import fleet
 from ..utils  import fntime, laps, spl
 
 
@@ -106,7 +106,6 @@ class Fetcher(Object):
         self.dosave = False
         self.seen = Urls()
         self.seenfn = None
-        broker.register(self)
 
     @staticmethod
     def display(obj):
@@ -162,7 +161,7 @@ class Fetcher(Object):
             txt = f'[{feedname}] '
         for obj in result:
             txt2 = txt + self.display(obj)
-            for _id, bot in broker.all("irc"):
+            for bot in fleet:
                 if "announce" in dir(bot):
                     bot.announce(txt2.rstrip())
         return counter
@@ -421,7 +420,7 @@ def syn(event):
 
 
 syn.threaded = True
-#add(syn)
+add(syn)
 
 
 
@@ -539,9 +538,6 @@ def imp(event):
     nrs = 0
     insertid = shortid()
     for obj in prs.parse(txt, 'outline', "name,display_list,xmlUrl"):
-        #if obj.xmlUrl and broker.find({"rss": obj.xmlUrl}):
-        #    event.reply(f"skipping {obj.xmlUrl}")
-        #    continue
         feed = Rss()
         construct(feed, obj)
         feed.rss = obj.xmlUrl

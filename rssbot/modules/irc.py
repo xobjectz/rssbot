@@ -26,7 +26,7 @@ from ..handle import Handler
 from ..log    import Logging, debug
 from ..object import Object, edit, fmt, keys
 from ..disk   import last, sync
-from ..run    import broker
+from ..run    import fleet
 from ..launch import launch
 
 
@@ -203,7 +203,7 @@ class IRC(CLI, Handler, Output):
         self.register('PRIVMSG', cb_privmsg)
         self.register('QUIT', cb_quit)
         self.register("366", cb_ready)
-        broker.register(self)
+        fleet.register(self)
 
     def announce(self, txt):
         "announce on all channels."
@@ -640,7 +640,7 @@ def mre(event):
     if not event.channel:
         event.reply('channel is not set.')
         return
-    bot = broker.get(event.orig)
+    bot = fleet.get(event.orig)
     if 'cache' not in dir(bot):
         event.reply('bot is missing cache')
         return
