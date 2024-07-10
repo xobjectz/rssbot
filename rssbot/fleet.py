@@ -14,6 +14,9 @@ class Fleet(Object):
 
     "Fleet"
 
+    def all(self):
+        return values(self)
+
     def announce(self, txt):
         "announce on all bots."
         for bot in values(self):

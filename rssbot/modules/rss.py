@@ -1,5 +1,5 @@
 # This file is placed in the Public Domain.
-# pylint: disable=R0903
+# pylint: disable=R0903,W0105
 
 
 "rich site syndicate"
@@ -161,9 +161,7 @@ class Fetcher(Object):
             txt = f'[{feedname}] '
         for obj in result:
             txt2 = txt + self.display(obj)
-            for bot in fleet:
-                if "announce" in dir(bot):
-                    bot.announce(txt2.rstrip())
+            fleet.announce(txt2.rstrip())
         return counter
 
     def run(self, silent=False):
@@ -409,6 +407,8 @@ add(rss)
 
 def syn(event):
     "synchronize feeds."
+    if DEBUG:
+        return
     fetcher = Fetcher()
     fetcher.start(False)
     thrs = fetcher.run(True)
@@ -419,9 +419,10 @@ def syn(event):
     event.reply(f"{nrs} feeds synced")
 
 
-syn.threaded = True
 add(syn)
 
+
+"OPML"
 
 
 class OPMLParser:
