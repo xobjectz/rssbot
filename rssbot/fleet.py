@@ -15,6 +15,7 @@ class Fleet(Object):
     "Fleet"
 
     def all(self):
+        "return all objects."
         return values(self)
 
     def announce(self, txt):

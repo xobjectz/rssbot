@@ -17,7 +17,7 @@ from rssbot.cmds   import add
 from rssbot.launch import launch
 from rssbot.log    import debug
 from rssbot.object import Object, fmt
-from rssbot.run    import broker
+from rssbot.run    import fleet
 
 
 def init():
@@ -49,8 +49,7 @@ class UDP(Object):
     def output(self, txt, addr=None):
         if addr:
             Cfg.addr = addr
-        for bot in broker.all():
-            bot.announce(txt.replace("\00", ""))
+        fleet.announce(txt.replace("\00", ""))
 
     def loop(self):
         try:

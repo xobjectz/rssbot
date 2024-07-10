@@ -1,1 +1,1 @@
-pylint rssbot bin/rssbot bin/rssbotd bin/rssbotsh bin/tinder tests
+pylint rssbot bin/rssbot bin/rssbotd bin/rssbotsh bin/tinder examples tests
