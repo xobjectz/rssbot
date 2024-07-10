@@ -4,7 +4,7 @@
 "list of bots."
 
 
-from .object import Object, keys
+from .object import Object, values
 
 
 rpr = object.__repr__
@@ -16,7 +16,7 @@ class Fleet(Object):
 
     def announce(self, txt):
         "announce on all bots."
-        for bot in keys(self):
+        for bot in values(self):
             if "announce" in dir(bot):
                 bot.announce(txt)
 

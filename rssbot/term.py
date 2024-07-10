@@ -6,6 +6,7 @@
 
 from .cli   import CLI
 from .event import Event
+from .run   import fleet
 
 
 class Console(CLI):
@@ -16,9 +17,11 @@ class Console(CLI):
         CLI.__init__(self, outer)
         self.inner = inner
         self.prompt = prompt
+        fleet.register(self)
 
     def announce(self, txt):
-        "disable announce."
+        "echo text"
+        self.raw(txt)
 
     def callback(self, evt):
         "wait for callback."

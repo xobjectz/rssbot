@@ -25,7 +25,7 @@ def init():
     for _fnm, obj in find("timer"):
         diff = float(obj.time) - ttime.time()
         if diff > 0:
-            timer = Timer(diff, fleet.announce)
+            timer = Timer(diff, fleet.announce, obj.rest)
             launch(timer.start)
 
 
@@ -214,12 +214,11 @@ def tmr(event):
     if not target or ttime.time() > target:
         event.reply("already passed given time.")
         return res
-    bot = fleet.get(event.orig)
     diff = target - ttime.time()
     event.reply("ok " +  laps(diff))
     timer = Timer(diff, fleet.announce, event.rest, thrname=event.cmd)
     timer.time = target
-    update(timer, event)
+    timer.rest = event.rest
     sync(timer)
     launch(timer.start)
     return res
