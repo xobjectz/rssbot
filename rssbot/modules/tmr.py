@@ -12,8 +12,6 @@ import time as ttime
 
 from ..cmds   import add
 from ..disk   import find, sync
-from ..event  import Event
-from ..object import fmt, update
 from ..run    import fleet
 from ..timer  import Timer
 from ..utils  import laps
@@ -62,9 +60,9 @@ class NoDate(Exception):
 def extract_date(daystr):
     "extract date from string."
     res = None
-    for fmt in FORMATS:
+    for fmtt in FORMATS:
         try:
-            res = ttime.mktime(ttime.strptime(daystr, fmt))
+            res = ttime.mktime(ttime.strptime(daystr, fmtt))
             break
         except ValueError:
             pass

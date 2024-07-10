@@ -13,11 +13,9 @@ import sys
 
 
 from rssbot.cfg   import Config
-from rssbot.cli   import CLI
-from rssbot.defer import Errors, errors, later
+from rssbot.defer import errors, later
 from rssbot.disk  import Persist, pidfile, skel
-from rssbot.log   import Logging
-from rssbot.main  import init
+from rssbot.main  import enable, init
 from rssbot.utils import forever, modnames
 
 
