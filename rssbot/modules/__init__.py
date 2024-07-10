@@ -5,19 +5,16 @@
 "modules"
 
 
-from . import cmd, err, fnd, irc, mod, req, rss, thr, tmr, upt
+from . import cmd, err, irc, mod, rss, thr, upt
 
 
 def __dir__():
     return (
         'cmd',
         'err',
-        'fnd',
         'irc',
         'mod',
-        'req',
         'rss',
         'thr',
-        'tmr',
         'upt'
     )

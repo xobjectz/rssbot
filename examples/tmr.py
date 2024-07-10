@@ -10,12 +10,12 @@ import re
 import time as ttime
 
 
-from ..cmds   import add
-from ..disk   import find, sync
-from ..run    import fleet
-from ..timer  import Timer
-from ..utils  import laps
-from ..launch import launch
+from rssbot.cmds   import add
+from rssbot.disk   import find, sync
+from rssbot.run    import fleet
+from rssbot.timer  import Timer
+from rssbot.utils  import laps
+from rssbot.launch import launch
 
 
 def init():

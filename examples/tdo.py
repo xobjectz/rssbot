@@ -8,10 +8,10 @@
 import time
 
 
-from ..cmds   import add
-from ..object import Object
-from ..disk   import find, sync, whitelist
-from ..utils  import fntime, laps
+from rssbot.cmds   import add
+from rssbot.object import Object
+from rssbot.disk   import find, sync, whitelist
+from rssbot.utils  import fntime, laps
 
 
 class NoDate(Exception):

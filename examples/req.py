@@ -77,6 +77,12 @@ p.s.
 """
 
 
+from rssbot.cmds import add
+
+
 def req(event):
     "reconsider"
     event.reply(__doc__)
+
+
+add(req)

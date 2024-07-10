@@ -21,8 +21,15 @@ sys.path.insert(0, os.getcwd())
 
 from rssbot.face import *
 
+
 from rssbot import modules
 from rssbot import user
+
+
+if os.path.exists("examples"):
+    import examples
+else:
+    examples = None
 
 
 modules.rss.DEBUG = True
@@ -131,7 +138,7 @@ def main():
     "main"
     Logging.out = Errors.out = print
     Cfg.dis = Cfg.sets.dis
-    Cfg.mod = ",".join(modnames(modules, user))
+    Cfg.mod = ",".join(modnames(modules, user, examples))
     if "v" in Cfg.opts:
         dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
         print(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
