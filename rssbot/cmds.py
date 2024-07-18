@@ -6,6 +6,7 @@
 
 
 import inspect
+import time
 
 
 from .object import Object, fqn
@@ -37,7 +38,7 @@ def command(bot, evt):
             func(evt)
             bot.show(evt)
     evt.ready()
-
+    time.sleep(0.001)
 
 def scan(mod) -> None:
     "scan module for commands."
