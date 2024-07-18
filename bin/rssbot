@@ -10,10 +10,13 @@ import os
 import sys
 
 
+sys.path.insert(0, os.getcwd())
+
+
 from rssbot.cfg    import Config
 from rssbot.defer  import errors
 from rssbot.disk   import Persist
-from rssbot.main   import cmnd, enable
+from rssbot.main   import cmnd, enable, scan
 from rssbot.parse  import parse
 
 
@@ -23,7 +26,7 @@ from rssbot import user
 
 Cfg         = Config()
 Cfg.dis     = ""
-Cfg.mod     = "mod,cmd,err,thr"
+Cfg.mod     = "mod,cmd,err,skl,thr"
 Cfg.name    = "rssbot"
 Cfg.opts    = ""
 Cfg.wdr     = os.path.expanduser(f"~/.{Cfg.name}")
@@ -44,6 +47,7 @@ def main():
     parse(Cfg, " ".join(sys.argv[1:]))
     Cfg.dis = Cfg.sets.dis
     Cfg.mod = ",".join(modnames())
+    scan(Cfg.mod, modules, user)
     cmnd(Cfg.otxt, print)
 
 

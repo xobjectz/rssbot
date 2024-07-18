@@ -97,6 +97,7 @@ SYSTEMD
     WorkingDirectory=/home/<user>/.rssbot
     ExecStart=/home/<user>/.local/pipx/venvs/rssbot/bin/rssbotd
     PIDFile=/home/<user>/.rssbot/rssbot.pid
+    ExitType=cgroup
     RemainAfterExit=yes
 
     [Install]
