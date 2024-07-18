@@ -13,11 +13,12 @@ import sys
 sys.path.insert(0, os.getcwd())
 
 
-from rssbot.cfg    import Config
-from rssbot.defer  import errors
-from rssbot.disk   import Persist
-from rssbot.main   import cmnd, enable, scan
-from rssbot.parse  import parse
+from rssbot.cfg   import Config
+from rssbot.defer import errors
+from rssbot.disk  import Persist
+from rssbot.main  import cmnd, enable, scan
+from rssbot.parse import parse
+from rssbot.utils import modnames
 
 
 from rssbot import modules
@@ -36,17 +37,12 @@ Cfg.pidfile = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 Persist.workdir = Cfg.wdr
 
 
-def modnames():
-    "list all modules."
-    return sorted({x for x in dir(modules) + dir(user) if not x.startswith("__")})
-
-
 def main():
     "main"
     enable(print)
     parse(Cfg, " ".join(sys.argv[1:]))
     Cfg.dis = Cfg.sets.dis
-    Cfg.mod = ",".join(modnames())
+    Cfg.mod = ",".join(modnames(modules, user))
     scan(Cfg.mod, modules, user)
     cmnd(Cfg.otxt, print)
 
