@@ -1,6 +1,0 @@
-grep -R sys rssbot
-grep -R "print(" rssbot
-grep -R __import__ rssbot
-grep -R importlib rssbot
-grep -R "import sys" rssbot
-#grep -R "import os" rssbot

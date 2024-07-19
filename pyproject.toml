@@ -37,8 +37,8 @@ packages=[
 ]
 script-files = [
     "bin/rssbot",
-    "bin/rssbotd",
-    "bin/rssbotsh"
+    "bin/rssbotc",
+    "bin/rssbotd"
 ]
 zip-safe=true
 

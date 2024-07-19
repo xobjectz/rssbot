@@ -9,7 +9,6 @@ import os
 
 
 NAME = __file__.split(os.sep)[-3]
-TITLE = "you have been {NAME}t!"
 
 
 def skl(event):
@@ -19,7 +18,7 @@ def skl(event):
     else:
         user  = getpass.getuser()
     txt = f"""[Unit]
-Description={TITLE}
+Description={NAME.upper()}
 Requires=network-online.target
 After=network-online.target
 
