@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rssbot"
 description = "24/7 feed fetcher"
-version = "572"
+version = "573"
 authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
