@@ -20,13 +20,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 
 
-from ..cmds   import add
 from ..dft    import Default
 from ..object import Object, construct, fmt, update
-from ..disk   import find, last, sync, whitelist
-from ..ool    import OoL, ladd
+from ..disk   import find, last, sync
+from ..ool    import OoL, append
 from ..repeat import Repeater
-from ..launch import launch
+from ..thread import launch
 from ..log    import debug
 from ..run    import fleet
 from ..utils  import fntime, laps, spl
@@ -60,9 +59,6 @@ class Feed(Default):
     "Feed"
 
 
-whitelist(Feed)
-
-
 class Rss(Default):
 
     "Rss"
@@ -74,9 +70,6 @@ class Rss(Default):
         self.rss          = ''
 
 
-whitelist(Rss)
-
-
 class Urls(OoL):
 
     "Seen"
@@ -85,17 +78,14 @@ class Urls(OoL):
         OoL.__init__(self)
         self.nrlinks = Object()
 
-def uadd(obj, url, item):
+def append_url(obj, url, item):
     "urls add."
     links = getattr(obj, url, None)
     if links:
         nrs = getattr(obj.nrlinks, url, None)
         if nrs and len(links) > nrs:
             links.pop(0)
-    ladd(obj, url, item)
-
-
-whitelist(Urls)
+    append(obj, url, item)
 
 
 class Fetcher(Object):
@@ -146,7 +136,7 @@ class Fetcher(Object):
                     uurl = fed.link
                 if uurl in getattr(self.seen, feed.rss, []):
                     continue
-                uadd(self.seen, feed.rss, uurl)
+                append_url(self.seen, feed.rss, uurl)
                 if self.dosave:
                     sync(fed)
                 result.append(fed)
@@ -323,9 +313,6 @@ def dpl(event):
     event.reply('ok')
 
 
-add(dpl)
-
-
 def nme(event):
     "set name of feed."
     if len(event.args) != 2:
@@ -337,9 +324,6 @@ def nme(event):
             feed.name = event.args[1]
             sync(feed, fnm)
     event.reply('ok')
-
-
-add(nme)
 
 
 def rem(event):
@@ -356,9 +340,6 @@ def rem(event):
     event.reply('ok')
 
 
-add(rem)
-
-
 def res(event):
     "restore a feed."
     if len(event.args) != 1:
@@ -371,9 +352,6 @@ def res(event):
             feed.__deleted__ = False
             sync(feed, fnm)
     event.reply('ok')
-
-
-add(res)
 
 
 def rss(event):
@@ -402,9 +380,6 @@ def rss(event):
     event.reply('ok')
 
 
-add(rss)
-
-
 def syn(event):
     "synchronize feeds."
     if DEBUG:
@@ -417,9 +392,6 @@ def syn(event):
         thr.join()
         nrs += 1
     event.reply(f"{nrs} feeds synced")
-
-
-add(syn)
 
 
 "OPML"
@@ -521,9 +493,6 @@ def exp(event):
     event.reply("</opml>")
 
 
-add(exp)
-
-
 def imp(event):
     "import opml."
     if not event.args:
@@ -547,6 +516,3 @@ def imp(event):
         nrs += 1
     if nrs:
         event.reply(f"added {nrs} urls.")
-
-
-add(imp)

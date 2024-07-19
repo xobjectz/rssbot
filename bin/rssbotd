@@ -16,7 +16,7 @@ from rssbot.cfg   import Config
 from rssbot.defer import errors, later
 from rssbot.disk  import Persist, pidfile, skel
 from rssbot.main  import enable, init
-from rssbot.utils import forever, modnames
+from rssbot.utils import forever
 
 
 from rssbot import modules
@@ -25,7 +25,7 @@ from rssbot import user
 
 Cfg         = Config()
 Cfg.dis     = ""
-Cfg.mod     = "cmd,err,mod,thr"
+Cfg.mod     = "irc,rss"
 Cfg.opts    = ""
 Cfg.name    = "rssbot"
 Cfg.user    = getpass.getuser()
@@ -82,9 +82,7 @@ def main():
     privileges(Cfg.user)
     if "-v" in sys.argv:
         enable(print)
-    modstr = ",".join(modnames(modules, user))
-    init(modules, modstr)
-    init(user, modstr)
+    init(Cfg.mod, modules, user)
     forever()
 
 

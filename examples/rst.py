@@ -19,7 +19,7 @@ from rssbot.dft    import Default
 from rssbot.disk   import Persist, fns
 from rssbot.log    import debug
 from rssbot.object import Object, fmt
-from rssbot.launch import launch
+from rssbot.thread import launch
 
 
 def init():

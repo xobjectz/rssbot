@@ -14,7 +14,7 @@ class OoL(Object):
     "Object of Lists."
 
 
-def ladd(obj, name, val):
+def append(obj, name, val):
     "add value to list."
     if name not in obj:
         setattr(obj, name, [])
@@ -22,7 +22,7 @@ def ladd(obj, name, val):
     lll.append(val)
 
 
-def lextend(obj, name, lis=None):
+def extend(obj, name, lis=None):
     "extend list."
     if lis is None:
         lis = []
@@ -34,6 +34,6 @@ def lextend(obj, name, lis=None):
 
 def __dir__():
     return (
-        "ladd",
-        "lextend"
+        "append",
+        "extend"
     )

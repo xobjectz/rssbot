@@ -10,12 +10,11 @@ import re
 import time as ttime
 
 
-from rssbot.cmds   import add
 from rssbot.disk   import find, sync
 from rssbot.run    import fleet
+from rssbot.thread import launch
 from rssbot.timer  import Timer
 from rssbot.utils  import laps
-from rssbot.launch import launch
 
 
 def init():
@@ -170,6 +169,7 @@ def to_day(daystr):
         line = ""
     return res
 
+
 def today():
     "return time of today."
     return str(datetime.datetime.today()).split()[0]
@@ -220,6 +220,3 @@ def tmr(event):
     sync(timer)
     launch(timer.start)
     return res
-
-
-add(tmr)

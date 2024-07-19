@@ -8,9 +8,8 @@
 import time
 
 
-from rssbot.cmds   import add
 from rssbot.object import Object
-from rssbot.disk   import find, sync, whitelist
+from rssbot.disk   import find, sync
 from rssbot.utils  import fntime, laps
 
 
@@ -26,9 +25,6 @@ class Todo(Object):
     def __init__(self):
         Object.__init__(self)
         self.txt = ''
-
-
-whitelist(Todo)
 
 
 def dne(event):
@@ -48,9 +44,6 @@ def dne(event):
         event.reply("nothing todo")
 
 
-add(dne)
-
-
 def tdo(event):
     "add todo."
     if not event.rest:
@@ -66,6 +59,3 @@ def tdo(event):
     obj.txt = event.rest
     sync(obj)
     event.reply('ok')
-
-
-add(tdo)

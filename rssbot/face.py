@@ -7,7 +7,7 @@
 
 
 from . import cache, client, cmds, defer, event, react
-from . import log, parse, disk, repeat, launch, timer, utils
+from . import log, parse, disk, repeat, thread, timer, utils
 
 
 from .cache  import *
@@ -21,7 +21,7 @@ from .parse  import *
 from .disk   import *
 from .react  import *
 from .repeat import *
-from .launch import *
+from .thread import *
 from .timer  import *
 from .utils  import *
 

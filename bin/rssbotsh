@@ -19,7 +19,7 @@ sys.path.insert(0, os.getcwd())
 from rssbot.cfg   import Config
 from rssbot.defer import errors
 from rssbot.disk  import Persist, skel
-from rssbot.main  import cmnd, enable, init
+from rssbot.main  import cmnd, enable, init, scan
 from rssbot.parse import parse
 from rssbot.term  import Console
 from rssbot.utils import forever, modnames
@@ -66,21 +66,20 @@ def wrap(func):
 
 def main():
     "main"
-    readline.redisplay()
-    enable(print)
-    skel()
     parse(Cfg, " ".join(sys.argv[1:]))
     Cfg.dis = Cfg.sets.dis
     Cfg.mod += "," + ",".join(modnames(modules, user, MODS))
+    readline.redisplay()
+    enable(print)
+    skel()
     if "v" in Cfg.opts:
         dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
         modiess = ",".join([x.upper() for x in modnames(modules, user, MODS)])
         print(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {modiess}'.replace("  ", " "))
+    scan(Cfg.mod, modules, user, MODS)
     csl = Console(print, input)
     if "i" in Cfg.opts:
-        init(modules, Cfg.mod, Cfg.dis)
-        init(user, Cfg.mod, Cfg.dis)
-        init(MODS, Cfg.mod, Cfg.dis)
+        init(Cfg.mod, modules, user, MODS)
     csl.start()
     cmnd(Cfg.otxt, print)
     forever()

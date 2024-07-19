@@ -9,7 +9,7 @@ import time
 
 
 from rssbot.object import Object
-from rssbot.disk   import find, sync, whitelist
+from rssbot.disk   import find, sync
 from rssbot.utils  import fntime, laps
 
 
@@ -20,9 +20,6 @@ class Log(Object):
     def __init__(self):
         super().__init__()
         self.txt = ''
-
-
-whitelist(Log)
 
 
 def log(event):

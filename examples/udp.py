@@ -14,10 +14,10 @@ import time
 
 
 from rssbot.cmds   import add
-from rssbot.launch import launch
 from rssbot.log    import debug
 from rssbot.object import Object, fmt
 from rssbot.run    import fleet
+from rssbot.thread import launch
 
 
 def init():

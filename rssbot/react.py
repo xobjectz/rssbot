@@ -11,7 +11,7 @@ import _thread
 
 
 from .object import Object
-from .launch import launch
+from .thread import launch
 
 
 class Reactor:

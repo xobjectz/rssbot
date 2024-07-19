@@ -8,10 +8,11 @@
 from .client import Client
 from .cmds   import command
 from .cmds   import scan as scancmd
-from .defer  import Errors, later
+from .defer  import Errors
 from .disk   import scan as scancls
 from .event  import Event
 from .log    import Logging
+from .thread import launch
 from .utils  import skip, spl
 
 
@@ -32,22 +33,21 @@ def enable(outer):
     Client.out = Errors.out = Logging.out = outer
 
 
-def init(pkg, modstr, disable=None):
+def init(modstr, *pkgs, disable=None):
     "scan modules for commands and classes"
-    mds = []
+    thrs = []
     for mod in spl(modstr):
         if disable and mod in spl(disable):
             continue
-        module = getattr(pkg, mod, None)
-        if not module:
-            continue
-        if "init" not in dir(module):
-            continue
-        try:
-            module.init()
-        except Exception as ex:
-            later(ex)
-    return mds
+        for pkg in pkgs:
+            modi = getattr(pkg, mod, None)
+            if not modi:
+                continue
+            if "init" not in dir(modi):
+                continue
+            thrs.append(launch(modi.init))
+            break
+    return thrs
 
 
 def scan(modstr, *pkgs, disable=""):

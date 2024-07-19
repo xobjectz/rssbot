@@ -17,25 +17,20 @@ import _thread
 
 
 from ..client import Client
-from ..cmds   import add, command
+from ..cmds   import command
 from ..dft    import Default
-from ..disk   import whitelist
 from ..defer  import later
 from ..event  import Event
 from ..log    import Logging, debug
 from ..object import Object, edit, fmt, keys
 from ..disk   import last, sync
 from ..run    import fleet
-from ..launch import launch
-
-
-NAME    = __file__.split(os.sep)[-3]
-
-
-saylock = _thread.allocate_lock()
+from ..thread import launch
 
 
 Logging.filter = ["PING", "PONG", "PRIVMSG"]
+NAME           = __file__.split(os.sep)[-3]
+saylock        = _thread.allocate_lock()
 
 
 def init():
@@ -75,9 +70,6 @@ class Config(Default):
         self.realname = self.realname or Config.realname
         self.server = self.server or Config.server
         self.username = self.username or Config.username
-
-
-whitelist(Config)
 
 
 class TextWrap(textwrap.TextWrapper):
@@ -630,9 +622,6 @@ def cfg(event):
         event.reply('ok')
 
 
-add(cfg)
-
-
 def mre(event):
     "show from output cache."
     if not event.channel:
@@ -653,9 +642,6 @@ def mre(event):
     event.reply(f'{size} more in cache')
 
 
-add(mre)
-
-
 def pwd(event):
     "create a base64 password."
     if len(event.args) != 2:
@@ -668,6 +654,3 @@ def pwd(event):
     base = base64.b64encode(enc)
     dcd = base.decode('ascii')
     event.reply(dcd)
-
-
-add(pwd)
