@@ -4,17 +4,17 @@
 "console"
 
 
-from .cli   import CLI
-from .event import Event
-from .run   import fleet
+from .client import Client
+from .event  import Event
+from .run    import fleet
 
 
-class Console(CLI):
+class Console(Client):
 
     "Console"
 
     def __init__(self, outer, inner, prompt="> "):
-        CLI.__init__(self, outer)
+        Client.__init__(self, outer)
         self.inner = inner
         self.prompt = prompt
         fleet.register(self)
@@ -24,7 +24,7 @@ class Console(CLI):
 
     def callback(self, evt):
         "wait for callback."
-        CLI.callback(self, evt)
+        Client.callback(self, evt)
         evt.wait()
 
     def poll(self):

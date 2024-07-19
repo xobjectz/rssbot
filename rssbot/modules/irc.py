@@ -16,13 +16,12 @@ import time
 import _thread
 
 
-from ..cli    import CLI
+from ..client import Client
 from ..cmds   import add, command
 from ..dft    import Default
 from ..disk   import whitelist
 from ..defer  import later
 from ..event  import Event
-from ..react  import Reactor
 from ..log    import Logging, debug
 from ..object import Object, edit, fmt, keys
 from ..disk   import last, sync
@@ -168,13 +167,12 @@ class Output:
         return 0
 
 
-class IRC(CLI, Reactor, Output):
+class IRC(Client, Output):
 
     "IRC"
 
     def __init__(self):
-        CLI.__init__(self)
-        Reactor.__init__(self)
+        Client.__init__(self)
         Output.__init__(self)
         self.buffer = []
         self.cfg = Config()
@@ -508,7 +506,7 @@ class IRC(CLI, Reactor, Output):
         self.events.connected.clear()
         self.events.joined.clear()
         launch(Output.out, self)
-        launch(Reactor.start, self)
+        launch(Client.start, self)
         launch(
                self.doconnect,
                self.cfg.server or "localhost",
@@ -524,7 +522,7 @@ class IRC(CLI, Reactor, Output):
         self.disconnect()
         self.dostop.set()
         self.oput(None, None)
-        Reactor.stop(self)
+        Client.stop(self)
 
     def wait(self):
         "wait for ready."

@@ -35,21 +35,21 @@ else:
 modules.rss.DEBUG = True
 
 
-LAP = 1
-NRS = 1
-NRCOMMAND = 1
-PERCALL   = 1
-STARTTIME = time.time()
-CLI.out   = print
+LAP        = 1
+NRS        = 1
+NRCOMMAND  = 1
+PERCALL    = 1
+STARTTIME  = time.time()
+Client.out = print
 
 
-Cfg         = Default()
-Cfg.debug   = True
-Cfg.mod     = ""
-Cfg.name    = "tinder"
-Cfg.silent  = False
-Cfg.skip    = ["debug",]
-Cfg.wdr     = ".test"
+Cfg        = Default()
+Cfg.debug  = True
+Cfg.mod    = ""
+Cfg.name   = "tinder"
+Cfg.silent = False
+Cfg.skip   = ["debug",]
+Cfg.wdr    = ".test"
 
 
 Persist.workdir = Cfg.wdr
@@ -76,7 +76,7 @@ param.tdo = ["mekker"]
 param.ver = [""]
 
 
-class CLII(CLI):
+class CLI(Client):
 
     "command line interface."
 
@@ -144,7 +144,7 @@ def main():
         print(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
     nrs = Cfg.index or 1
     nrcommand = len(Commands.cmds) or 1
-    clt = CLII()
+    clt = CLI()
     clt.start()
     clt.threaded = "t" in Cfg.opts
     thrs = []

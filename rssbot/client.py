@@ -2,7 +2,7 @@
 # pylint: disable=W0125
 
 
-"command line interface"
+"client"
 
 
 from .cache  import Cache
@@ -10,9 +10,9 @@ from .cmds   import command
 from .react  import Reactor
 
 
-class CLI(Reactor):
+class Client(Reactor):
 
-    "CLI"
+    "Client"
 
     cache = Cache()
     out = None
@@ -40,5 +40,5 @@ class CLI(Reactor):
 
 def __dir__():
     return (
-       'CLI',
+       'Client',
     )

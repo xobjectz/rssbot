@@ -6,12 +6,12 @@
 "interface"
 
 
-from . import cache, cli, cmds, defer, event, react
+from . import cache, client, cmds, defer, event, react
 from . import log, parse, disk, repeat, launch, timer, utils
 
 
 from .cache  import *
-from .cli    import *
+from .client import *
 from .cmds   import *
 from .defer  import *
 from .event  import *

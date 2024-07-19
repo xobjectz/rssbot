@@ -5,21 +5,21 @@
 "main"
 
 
-from .cli   import CLI
-from .cmds  import command
-from .cmds  import scan as scancmd
-from .defer import Errors, later
-from .disk  import scan as scancls
-from .event import Event
-from .log   import Logging
-from .utils import skip, spl
+from .client import Client
+from .cmds   import command
+from .cmds   import scan as scancmd
+from .defer  import Errors, later
+from .disk   import scan as scancls
+from .event  import Event
+from .log    import Logging
+from .utils  import skip, spl
 
 
 def cmnd(txt, outer):
     "do a command using the provided output function."
     if not txt:
         return None
-    cli = CLI(outer)
+    cli = Client(outer)
     evn = Event()
     evn.txt = txt
     command(cli, evn)
@@ -29,7 +29,7 @@ def cmnd(txt, outer):
 
 def enable(outer):
     "enable printing."
-    CLI.out = Errors.out = Logging.out = outer
+    Client.out = Errors.out = Logging.out = outer
 
 
 def init(pkg, modstr, disable=None):
