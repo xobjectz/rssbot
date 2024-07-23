@@ -96,7 +96,6 @@ SYSTEMD
     Group=<user>
     WorkingDirectory=/home/<user>/.rssbot
     ExecStart=/home/<user>/.local/pipx/venvs/rssbot/bin/rssbotd
-    PIDFile=/home/<user>/.rssbot/rssbot.pid
     ExitType=cgroup
     RemainAfterExit=yes
 
@@ -117,8 +116,8 @@ FILES
 
     ~/.rssbot
     ~/.local/bin/rssbot
+    ~/.local/bin/rssbotc
     ~/.local/bin/rssbotd
-    ~/.local/bin/rssbotsh
     ~/.local/pipx/venvs/rssbot/
 
 
