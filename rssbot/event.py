@@ -32,11 +32,11 @@ class Event(Default):
         "add text to the result"
         self.result.append(txt)
 
-    def wait(self):
+    def wait(self, timeout=None):
         "wait for event to be ready."
+        self._ready.wait(timeout)
         if self._thr:
             self._thr.join()
-        self._ready.wait()
         return self.result
 
 

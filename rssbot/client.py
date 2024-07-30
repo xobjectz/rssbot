@@ -6,7 +6,8 @@
 
 
 from .cache  import Cache
-from .cmds   import command
+from .cmds   import Commands
+from .parse  import parse
 from .react  import Reactor
 
 
@@ -36,6 +37,16 @@ class Client(Reactor):
         "show results into a channel."
         for txt in evt.result:
             self.say(evt.channel, txt)
+
+
+def command(bot, evt):
+    "check for and run a command."
+    parse(evt)
+    func = getattr(Commands.cmds, evt.cmd, None)
+    if func:
+        func(evt)
+        bot.show(evt)
+    evt.ready()
 
 
 def __dir__():

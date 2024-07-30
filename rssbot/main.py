@@ -5,11 +5,10 @@
 "main"
 
 
-from .client import Client
-from .cmds   import command
-from .cmds   import scan as scancmd
-from .defer  import Errors
-from .disk   import scan as scancls
+from .client import Client, command
+from .cmds   import Commands
+from .errors import Errors
+from .disk   import Persist
 from .event  import Event
 from .log    import Logging
 from .thread import launch
@@ -60,8 +59,8 @@ def scan(modstr, *pkgs, disable=""):
             module = getattr(pkg, modname, None)
             if not module:
                 continue
-            scancmd(module)
-            scancls(module)
+            Commands.scan(module)
+            Persist.scan(module)
     return mds
 
 

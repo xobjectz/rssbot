@@ -16,10 +16,9 @@ import time
 import _thread
 
 
-from ..client import Client
-from ..cmds   import command
+from ..client import Client, command
 from ..dft    import Default
-from ..defer  import later
+from ..errors import later
 from ..event  import Event
 from ..log    import Logging, debug
 from ..object import Object, edit, fmt, keys

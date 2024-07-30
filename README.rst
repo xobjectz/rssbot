@@ -10,7 +10,7 @@ INSTALL
 
     $ pipx install rssbot
     $ pipx ensurepath
-
+    # nixt skl > /etc/systemd/system/nixt.service
 
 SYNOPSIS
 
@@ -80,6 +80,12 @@ CONFIGURATION
 SYSTEMD
 
 ::
+
+    run this (as root) to install a service file:
+
+    # nixt skl > /etc/systemd/system/nixt.service
+
+    or
 
     save the following it in /etc/systemd/system/rssbot.service and
     replace "<user>" with the user running pipx

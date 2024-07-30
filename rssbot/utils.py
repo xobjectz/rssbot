@@ -5,9 +5,11 @@
 "utilities"
 
 
+import os
 import pathlib
+import pwd
 import time
-import types
+import types as rtypes
 import _thread
 
 
@@ -93,7 +95,7 @@ def modnames(*args):
 
 def named(obj):
     "return a full qualified name of an object/function/module."
-    if isinstance(obj, types.ModuleType):
+    if isinstance(obj, rtypes.ModuleType):
         return obj.__name__
     typ = type(obj)
     if '__builtins__' in dir(typ):
@@ -107,6 +109,23 @@ def named(obj):
     if '__name__' in dir(obj):
         return f'{obj.__class__.__name__}.{obj.__name__}'
     return None
+
+
+def pidfile(pid):
+    "write the pid to a file."
+    if os.path.exists(pid):
+        os.unlink(pid)
+    path = pathlib.Path(pid)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(pid, "w", encoding="utf-8") as fds:
+        fds.write(str(os.getpid()))
+
+
+def privileges(username):
+    "drop privileges."
+    pwnam = pwd.getpwnam(username)
+    os.setgid(pwnam.pw_gid)
+    os.setuid(pwnam.pw_uid)
 
 
 def skip(name, skipp):

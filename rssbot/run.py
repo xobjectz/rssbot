@@ -7,6 +7,7 @@
 from .cache import Cache
 from .fleet import Fleet
 
+
 cache = Cache()
 fleet = Fleet()
 
@@ -14,5 +15,6 @@ fleet = Fleet()
 def __dir__():
     return (
         'cache',
-        'fleet'
+        'fleet',
+        'pool'
     )

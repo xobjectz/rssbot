@@ -1,5 +1,5 @@
 # This file is placed in the Public Domain.
-# pylint: disable=R0903
+# pylint: disable=R0903,W0105
 
 
 "persistence"
@@ -25,6 +25,19 @@ class Persist(Object):
     fqns = []
     workdir = ""
 
+    @staticmethod
+    def scan(mod):
+        "scan module for classes."
+        for key, clz in inspect.getmembers(mod, inspect.isclass):
+            if key.startswith("cb"):
+                continue
+            if not issubclass(clz, Object):
+                continue
+            whitelist(clz)
+
+
+"methods"
+
 
 def fetch(obj, pth):
     "read object from disk."
@@ -32,6 +45,35 @@ def fetch(obj, pth):
         pth2 = store(pth)
         read(obj, pth2)
         return os.sep.join(pth.split(os.sep)[-3:])
+
+
+def last(obj, selector=None):
+    "return last object saved."
+    if selector is None:
+        selector = {}
+    result = sorted(
+                    find(fqn(obj), selector),
+                    key=lambda x: fntime(x[0])
+                   )
+    res = None
+    if result:
+        inp = result[-1]
+        update(obj, inp[-1])
+        res = inp[0]
+    return res
+
+
+def sync(obj, pth=None):
+    "sync object to disk."
+    with disklock:
+        if pth is None:
+            pth = ident(obj)
+        pth2 = store(pth)
+        write(obj, pth2)
+        return pth
+
+
+"utilities"
 
 
 def fns(mtc=""):
@@ -45,6 +87,17 @@ def fns(mtc=""):
                     ddd = os.path.join(rootdir, dname)
                     for fll in os.scandir(ddd):
                         yield strip(os.path.join(ddd, fll))
+
+
+def long(name):
+    "match from single name to long name."
+    split = name.split(".")[-1].lower()
+    res = name
+    for names in types():
+        if split == names.split(".")[-1].lower():
+            res = names
+            break
+    return res
 
 
 def find(mtc, selector=None, index=None, deleted=False):
@@ -64,58 +117,12 @@ def find(mtc, selector=None, index=None, deleted=False):
         yield (fnm, obj)
 
 
-def last(obj, selector=None):
-    "return last object saved."
-    if selector is None:
-        selector = {}
-    result = sorted(
-                    find(fqn(obj), selector),
-                    key=lambda x: fntime(x[0])
-                   )
-    res = None
-    if result:
-        inp = result[-1]
-        update(obj, inp[-1])
-        res = inp[0]
-    return res
-
-
-def long(name):
-    "match from single name to long name."
-    split = name.split(".")[-1].lower()
-    res = name
-    for named in types():
-        if split == named.split(".")[-1].lower():
-            res = named
-            break
-    return res
-
-
-def pidfile(pid):
-    "write the pid to a file."
-    if os.path.exists(pid):
-        os.unlink(pid)
-    path = pathlib.Path(pid)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(pid, "w", encoding="utf-8") as fds:
-        fds.write(str(os.getpid()))
-
-
-def scan(mod):
-    "scan module for classes."
-    for key, clz in inspect.getmembers(mod, inspect.isclass):
-        if key.startswith("cb"):
-            continue
-        if not issubclass(clz, Object):
-            continue
-        whitelist(clz)
-
-
 def skel():
     "create directory,"
     stor = os.path.join(Persist.workdir, "store", "")
     path = pathlib.Path(stor)
     path.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 def store(pth=""):
@@ -126,24 +133,17 @@ def store(pth=""):
     return os.path.join(Persist.workdir, "store", pth)
 
 
-def sync(obj, pth=None):
-    "sync object to disk."
-    with disklock:
-        if pth is None:
-            pth = ident(obj)
-        pth2 = store(pth)
-        write(obj, pth2)
-        return pth
-
-
 def types():
     "return types stored."
-    return [x.name for x in os.scandir(store())]
+    return os.listdir(store())
 
 
 def whitelist(clz):
     "whitelist classes."
     Persist.fqns.append(fqn(clz))
+
+
+"interface"
 
 
 def __dir__():
@@ -155,9 +155,10 @@ def __dir__():
         'last',
         'long',
         'pidfile',
-        'scan',
+        'scancls',
         'skel',
         'store',
         'sync',
-        'types'
+        'types',
+        'whitelist'
     )

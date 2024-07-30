@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
-# pylint: disable=C0413,W0212,E0401
+# pylint: disable=C0413,W0212,W0613,E0401
 
 
 "main"
 
 
+import getpass
 import os
 import sys
 
@@ -13,23 +14,24 @@ import sys
 sys.path.insert(0, os.getcwd())
 
 
-from rssbot.cfg   import Config
-from rssbot.defer import errors
-from rssbot.disk  import Persist
-from rssbot.main  import cmnd, enable, scan
-from rssbot.parse import parse
-from rssbot.utils import modnames
+from rssbot.cfg    import Config
+from rssbot.cmds   import Commands
+from rssbot.errors import errors
+from rssbot.disk   import Persist, skel
+from rssbot.main   import cmnd, enable, scan
+from rssbot.parse  import parse
+from rssbot.utils  import modnames, privileges
 
 
-from rssbot import modules
-from rssbot import user
+from rssbot import modules, user
 
 
 Cfg         = Config()
 Cfg.dis     = ""
-Cfg.mod     = "mod,cmd,err,skl,thr"
+Cfg.mod     = "cmd,irc,rss"
 Cfg.name    = "rssbot"
 Cfg.opts    = ""
+Cfg.user    = getpass.getuser()
 Cfg.wdr     = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
@@ -37,13 +39,46 @@ Cfg.pidfile = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 Persist.workdir = Cfg.wdr
 
 
+def skl(event):
+    "create service file (pipx)."
+    privileges(getpass.getuser())
+    skel()
+
+
+def srv(event):
+    "create service file (pipx)."
+    if event.args:
+        username = event.args[0]
+    else:
+        username  = getpass.getuser()
+    txt = f"""[Unit]
+Description={Cfg.name.upper()}
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={username}
+Group={username}
+WorkingDirectory=/home/{username}/.{Cfg.name}
+ExecStart=/home/{username}/.local/bin/{Cfg.name}d
+ExitType=control-group
+KillSignal=SIGKILL
+KillType=control-group
+RemainAfterExit=yes
+
+[Install]
+WantedBy=default.target"""
+    event.reply(txt)
+
+
 def main():
     "main"
-    enable(print)
     parse(Cfg, " ".join(sys.argv[1:]))
-    Cfg.dis = Cfg.sets.dis
-    Cfg.mod = ",".join(modnames(modules, user))
-    scan(Cfg.mod, modules, user)
+    Commands.add(skl)
+    Commands.add(srv)
+    enable(print)
+    scan(Cfg.mod, modules)
     cmnd(Cfg.otxt, print)
 
 
