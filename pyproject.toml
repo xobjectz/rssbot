@@ -8,8 +8,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rssbot"
-description = "24/7 feed fetcher"
-version = "573"
+description = "24/7 Feed Fetcher"
+version = "574"
 authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
@@ -33,11 +33,9 @@ classifiers = [
 packages=[
     "rssbot",
     "rssbot.modules",
-    "rssbot.user"
 ]
 script-files = [
     "bin/rssbot",
-    "bin/rssbotc",
     "bin/rssbotd"
 ]
 zip-safe=true

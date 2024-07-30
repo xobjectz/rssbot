@@ -5,7 +5,6 @@
 "internet relay chat"
 
 
-import base64
 import os
 import queue
 import socket
@@ -16,13 +15,13 @@ import time
 import _thread
 
 
-from ..client import Client, command
+from ..client import Client
 from ..dft    import Default
 from ..errors import later
 from ..event  import Event
 from ..log    import Logging, debug
-from ..object import Object, edit, fmt, keys
-from ..disk   import last, sync
+from ..object import Object, fmt
+from ..disk   import last
 from ..run    import fleet
 from ..thread import launch
 
@@ -189,7 +188,6 @@ class IRC(Client, Output):
         self.register('ERROR', cb_error)
         self.register('LOG', cb_log)
         self.register('NOTICE', cb_notice)
-        self.register('PRIVMSG', cb_privmsg)
         self.register('QUIT', cb_quit)
         self.register("366", cb_ready)
         fleet.register(self)
@@ -579,77 +577,8 @@ def cb_notice(bot, evt):
         bot.docommand('NOTICE', evt.channel, txt)
 
 
-def cb_privmsg(bot, evt):
-    "privmsg callback."
-    if not bot.cfg.commands:
-        return
-    if evt.txt:
-        if evt.txt[0] in ['!',]:
-            evt.txt = evt.txt[1:]
-        elif evt.txt.startswith(f'{bot.cfg.nick}:'):
-            evt.txt = evt.txt[len(bot.cfg.nick)+1:]
-        else:
-            return
-        if evt.txt:
-            evt.txt = evt.txt[0].lower() + evt.txt[1:]
-        debug(f"command from {evt.origin}: {evt.txt}")
-        command(bot, evt)
-
-
 def cb_quit(bot, evt):
     "quit callback."
     debug(f"quit from {bot.cfg.server}")
     if evt.orig and evt.orig in bot.zelf:
         bot.stop()
-
-
-def cfg(event):
-    "configure command."
-    config = Config()
-    last(config)
-    if not event.sets:
-        event.reply(
-                    fmt(
-                        config,
-                        keys(config),
-                        skip='control,password,realname,sleep,username'.split(",")
-                       )
-                   )
-    else:
-        edit(config, event.sets)
-        sync(config)
-        event.reply('ok')
-
-
-def mre(event):
-    "show from output cache."
-    if not event.channel:
-        event.reply('channel is not set.')
-        return
-    bot = fleet.get(event.orig)
-    if 'cache' not in dir(bot):
-        event.reply('bot is missing cache')
-        return
-    if event.channel not in bot.cache:
-        event.reply(f'no output in {event.channel} cache.')
-        return
-    for _x in range(3):
-        txt = bot.gettxt(event.channel)
-        if txt:
-            bot.say(event.channel, txt)
-    size = bot.size(event.channel)
-    event.reply(f'{size} more in cache')
-
-
-def pwd(event):
-    "create a base64 password."
-    if len(event.args) != 2:
-        event.reply('pwd <nick> <password>')
-        return
-    arg1 = event.args[0]
-    arg2 = event.args[1]
-    txt = f'\x00{arg1}\x00{arg2}'
-    enc = txt.encode('ascii')
-    base = base64.b64encode(enc)
-    dcd = base.decode('ascii')
-    event.reply(dcd)

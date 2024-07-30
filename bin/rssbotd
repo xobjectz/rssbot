@@ -12,15 +12,14 @@ import pwd
 import sys
 
 
-from rssbot.cfg   import Config
-from rssbot.defer import errors, later
-from rssbot.disk  import Persist, pidfile, skel
-from rssbot.main  import enable, init
-from rssbot.utils import forever
+from rssbot.cfg    import Config
+from rssbot.errors import errors, later
+from rssbot.disk   import Persist, skel
+from rssbot.main   import enable, init
+from rssbot.utils  import forever, pidfile
 
 
 from rssbot import modules
-from rssbot import user
 
 
 Cfg         = Config()
@@ -83,7 +82,7 @@ def main():
     privileges(Cfg.user)
     if "-v" in sys.argv:
         enable(print)
-    init(Cfg.mod, modules, user)
+    init(Cfg.mod, modules)
     forever()
 
 

@@ -154,7 +154,6 @@ def __dir__():
         'find',
         'last',
         'long',
-        'pidfile',
         'scancls',
         'skel',
         'store',
