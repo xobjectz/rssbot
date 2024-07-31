@@ -76,13 +76,14 @@ class Urls(OoL):
         OoL.__init__(self)
         self.nrlinks = Object()
 
+
 def append_url(obj, url, item):
     "urls add."
     links = getattr(obj, url, None)
     if links:
         nrs = getattr(obj.nrlinks, url, None)
-        if nrs and len(links) >= nrs:
-            links.pop()
+        if nrs and len(links) > nrs:
+            links.pop(0)
     append(obj, url, item)
 
 
