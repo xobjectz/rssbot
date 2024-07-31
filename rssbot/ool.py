@@ -34,6 +34,6 @@ def extend(obj, name, lis=None):
 
 def __dir__():
     return (
-        "append",
-        "extend"
+        'append',
+        'extend'
     )

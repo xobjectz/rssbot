@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rssbot"
 description = "24/7 Feed Fetcher"
-version = "574"
+version = "575"
 authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
@@ -24,6 +24,10 @@ classifiers = [
 ]
 
 
+[project.scripts]
+"rssbot"  = "rssbot.__main__:main"
+"rssbotd" = "rssbot.daemon:main"
+
 [project.urls]
 "home" = "https://pypi.org/project/rssbot"
 "bugs" = "https://github.com/xobjectz/rssbot/issues"
@@ -33,10 +37,6 @@ classifiers = [
 packages=[
     "rssbot",
     "rssbot.modules",
-]
-script-files = [
-    "bin/rssbot",
-    "bin/rssbotd"
 ]
 zip-safe=true
 
