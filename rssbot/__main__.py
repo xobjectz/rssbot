@@ -271,6 +271,7 @@ User={username}
 Group={username}
 WorkingDirectory=/home/{username}/.{Cfg.name}
 ExecStart=/home/{username}/.local/bin/{Cfg.name}d
+ExecStartPre=/home/bart/.local/bin/rssbot skl
 ExitType=control-group
 KillSignal=SIGKILL
 KillType=control-group
