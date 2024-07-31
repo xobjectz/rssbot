@@ -13,9 +13,6 @@ import sys
 import time
 
 
-sys.path.insert(0, os.getcwd())
-
-
 from rssbot.cfg    import Config
 from rssbot.cmds   import Commands
 from rssbot.dft    import Default

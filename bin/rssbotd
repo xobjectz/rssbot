@@ -15,17 +15,15 @@ import sys
 from rssbot.cfg    import Config
 from rssbot.errors import errors, later
 from rssbot.disk   import Persist, skel
-from rssbot.main   import enable, init
-from rssbot.utils  import forever, pidfile
+from rssbot.main   import enable, init, wrap
+from rssbot.utils  import forever, pidfile, privileges
 
 
 from rssbot import modules
 
 
 Cfg         = Config()
-Cfg.dis     = ""
 Cfg.mod     = "irc,rss"
-Cfg.opts    = ""
 Cfg.name    = "rssbot"
 Cfg.user    = getpass.getuser()
 Cfg.wdr     = os.path.expanduser(f"~/.{Cfg.name}")
@@ -55,33 +53,13 @@ def daemon(verbose=False):
     os.chdir("/")
 
 
-def privileges(username):
-    "drop privileges."
-    pwnam = pwd.getpwnam(username)
-    os.setgid(pwnam.pw_gid)
-    os.setuid(pwnam.pw_uid)
-
-
-def wrap(func):
-    "catch exceptions"
-    try:
-        func()
-    except (KeyboardInterrupt, EOFError):
-        print("")
-    except Exception as ex:
-        later(ex)
-    errors()
-
-
 def main():
     "main"
-    daemon("-v" in sys.argv)
-    os.nice(0)
+    daemon()
+    os.nice(10)
     skel()
     pidfile(Cfg.pidfile)
     privileges(Cfg.user)
-    if "-v" in sys.argv:
-        enable(print)
     init(Cfg.mod, modules)
     forever()
 

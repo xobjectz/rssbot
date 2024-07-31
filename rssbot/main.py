@@ -7,7 +7,7 @@
 
 from .client import Client, command
 from .cmds   import Commands
-from .errors import Errors
+from .errors import Errors, errors, later
 from .disk   import Persist
 from .event  import Event
 from .log    import Logging
@@ -64,10 +64,20 @@ def scan(modstr, *pkgs, disable=""):
     return mds
 
 
+def wrap(func):
+    "catch exceptions"
+    try:
+        func()
+    except Exception as ex:
+        later(ex)
+    errors()
+
+
 def __dir__():
     return (
         'cmnd',
         'enable',
         'init',
-        'scan'
+        'scan',
+        'wrap'
     )
