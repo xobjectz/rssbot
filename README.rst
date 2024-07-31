@@ -4,13 +4,6 @@ NAME
 
     RSSBOT - 24/7 feed Fetcher
 
-INSTALL
-
-::
-
-    $ pipx install rssbot
-    $ pipx ensurepath
-    # nixt skl > /etc/systemd/system/nixt.service
 
 SYNOPSIS
 
@@ -29,6 +22,18 @@ DESCRIPTION
     RSSBOT comes with a cli to configure and a daemon to run in the
     background, hooking the daemon in systemd brings a 24/7 available
     rssbot in your channel.
+
+
+INSTALL
+
+::
+
+    $ pipx install rssbot
+    $ pipx ensurepath
+    $ rssbot skl
+    $ rssbot srv > rssbot.service
+    $ sudo mv rssbot.service /etc/systemd/system/
+    $ sudo systemctl enable rssbot --now
 
 
 COMMANDS
@@ -81,12 +86,6 @@ SYSTEMD
 
 ::
 
-    run this (as root) to install a service file:
-
-    # nixt skl > /etc/systemd/system/nixt.service
-
-    or
-
     save the following it in /etc/systemd/system/rssbot.service and
     replace "<user>" with the user running pipx
 
@@ -101,7 +100,10 @@ SYSTEMD
     User=<user>
     Group=<user>
     WorkingDirectory=/home/<user>/.rssbot
-    ExecStart=/home/<user>/.local/pipx/venvs/rssbot/bin/rssbotd
+    ExecStart=/home/<user>/.local/bin/rssbotd
+    ExitType=control-group
+    KillSignal=SIGKILL
+    KillType=control-group
     ExitType=cgroup
     RemainAfterExit=yes
 
