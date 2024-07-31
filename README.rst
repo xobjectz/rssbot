@@ -31,9 +31,6 @@ INSTALL
     $ pipx install rssbot
     $ pipx ensurepath
     $ rssbot skl
-    $ rssbot srv > rssbot.service
-    $ sudo mv rssbot.service /etc/systemd/system/
-    $ sudo systemctl enable rssbot --now
 
 
 COMMANDS
@@ -86,7 +83,11 @@ SYSTEMD
 
 ::
 
-    save the following it in /etc/systemd/system/rssbot.service and
+    $ rssbot srv > rssbot.service
+    $ sudo mv rssbot.service /etc/systemd/system/
+    $ sudo systemctl enable rssbot --now
+
+    or save the following it in /etc/systemd/system/rssbot.service and
     replace "<user>" with the user running pipx
 
 
@@ -112,7 +113,6 @@ SYSTEMD
 
     then run this
 
-    $ mkdir ~/.rssbot
     $ sudo systemctl enable rssbot --now
 
     default channel/server is #rssbot on localhost
@@ -124,7 +124,6 @@ FILES
 
     ~/.rssbot
     ~/.local/bin/rssbot
-    ~/.local/bin/rssbotc
     ~/.local/bin/rssbotd
     ~/.local/pipx/venvs/rssbot/
 
