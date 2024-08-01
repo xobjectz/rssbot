@@ -100,11 +100,13 @@ SYSTEMD
     Type=simple
     User=<user>
     Group=<user>
+    ExecStartPre=/home/<user>/.local/bin/rssbot skl
     ExecStart=/home/<user>/.local/bin/rssbotd
     ExitType=cgroup
     KillSignal=SIGKILL
-    KillType=control-group
+    KillMode=control-group
     RemainAfterExit=yes
+    Restart=no
 
     [Install]
     WantedBy=default.target

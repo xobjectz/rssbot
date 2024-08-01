@@ -2,7 +2,7 @@
 # pylint: disable=C0413,W0105,W0212,W0613,E0401
 
 
-"main"
+"runtime"
 
 
 import base64
@@ -33,7 +33,7 @@ from rssbot.modules.rss import shortid
 
 Cfg         = Config()
 Cfg.dis     = ""
-Cfg.mod     = "cmd,irc,rss"
+Cfg.mod     = "irc,rss"
 Cfg.name    = "rssbot"
 Cfg.opts    = ""
 Cfg.user    = getpass.getuser()
@@ -269,27 +269,25 @@ After=network-online.target
 Type=simple
 User={username}
 Group={username}
-WorkingDirectory=/home/{username}/.{Cfg.name}
+ExecStartPre=/home/{username}/.local/bin/rssbot skl
 ExecStart=/home/{username}/.local/bin/{Cfg.name}d
-ExecStartPre=/home/bart/.local/bin/rssbot skl
-ExitType=control-group
+ExitType=cgroup
 KillSignal=SIGKILL
-KillType=control-group
+KillMode=control-group
 RemainAfterExit=yes
+Restart=no
 
 [Install]
 WantedBy=default.target"""
     event.reply(txt)
 
 
-mne = sys.modules.get("rssbot.__main__")
-
-
 def main():
     "main"
     parse(Cfg, " ".join(sys.argv[1:]))
     enable(print)
-    Commands.scan(mne)
+    from rssbot import __main__
+    Commands.scan(__main__)
     cmnd(Cfg.otxt, print)
 
 
