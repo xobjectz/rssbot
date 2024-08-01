@@ -282,7 +282,7 @@ WantedBy=default.target"""
     event.reply(txt)
 
 
-mne = sys.modules.get("__main__")
+mne = sys.modules.get("rssbot.__main__")
 
 
 def main():

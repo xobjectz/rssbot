@@ -30,7 +30,6 @@ INSTALL
 
     $ pipx install rssbot
     $ pipx ensurepath
-    $ rssbot skl
 
 
 COMMANDS
@@ -87,6 +86,7 @@ SYSTEMD
     $ sudo mv rssbot.service /etc/systemd/system/
     $ sudo systemctl enable rssbot --now
 
+
     or save the following it in /etc/systemd/system/rssbot.service and
     replace "<user>" with the user running pipx
 
@@ -100,12 +100,10 @@ SYSTEMD
     Type=simple
     User=<user>
     Group=<user>
-    WorkingDirectory=/home/<user>/.rssbot
     ExecStart=/home/<user>/.local/bin/rssbotd
-    ExitType=control-group
+    ExitType=cgroup
     KillSignal=SIGKILL
     KillType=control-group
-    ExitType=cgroup
     RemainAfterExit=yes
 
     [Install]

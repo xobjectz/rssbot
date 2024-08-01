@@ -53,11 +53,11 @@ def daemon(verbose=False):
 def main():
     "main"
     daemon()
-    os.nice(10)
     skel()
-    pidfile(Cfg.pidfile)
     privileges(Cfg.user)
+    pidfile(Cfg.pidfile)
     init(Cfg.mod, modules)
+    os.nice(10)
     forever()
 
 
